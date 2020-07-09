@@ -20,6 +20,7 @@ const DismissKeyboard = ({ children }) => (
 
 class Register extends React.Component {
   render() {
+    const { navigation } = this.props;
     return (
         <DismissKeyboard>
           <Block flex middle>
@@ -106,7 +107,11 @@ class Register extends React.Component {
                             </Block>
                           </Block>
                           <Block center>
-                            <Button color="primary" round style={styles.createButton}>
+                            <Button
+                                color="primary"
+                                round
+                                style={styles.createButton}
+                                onPress={() => navigation.navigate("App")}>
                               <Text
                                   style={{ fontFamily: 'montserrat-bold' }}
                                   size={14}

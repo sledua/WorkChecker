@@ -4,7 +4,7 @@ import { Easing, Animated, Dimensions } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 // screens
-import Pro from '../screens/Pro';
+import About from '../screens/About';
 import Profile from '../screens/Profile';
 import Register from '../screens/Register';
 import Components from '../screens/Components';
@@ -21,28 +21,6 @@ const { width } = Dimensions.get("screen");
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
-function ComponentsStack(props) {
-  return (
-    <Stack.Navigator initialRouteName="Components" mode="card" headerMode="screen">
-      <Stack.Screen name="Components" component={Components} options={{
-        header:({ navigation, scene }) => (<Header title="Components" navigation={navigation} scene={scene} />),
-        backgroundColor: "#FFFFFF"
-      }}/>
-    </Stack.Navigator>
-  );
-}
-
-function ArticlesStack(props) {
-  return (
-    <Stack.Navigator initialRouteName="Articles" mode="card" headerMode="screen">
-      <Stack.Screen name="Articles" component={Articles} options={{
-        header: ({ navigation, scene }) => (<Header title="Articles" navigation={navigation} scene={scene} />),
-        backgroundColor: '#FFFFFF'
-      }} />
-    </Stack.Navigator>
-  );
-}
-
 function AccountStack(props) {
   return (
     <Stack.Navigator initialRouteName="Account" mode="card" headerMode="screen">
@@ -50,7 +28,7 @@ function AccountStack(props) {
         name="Account"
         component={Register}
         options={{
-          //headerShown: false,
+          headerShown: false,
           header: ({ navigation, scene }) => (
             <Header
               transparent
@@ -65,7 +43,30 @@ function AccountStack(props) {
     </Stack.Navigator>
   );
 }
-
+function AboutStack(props) {
+    return(
+        <Stack.Navigator initialRouteName="About" mode="card" headerMode="screen">
+            <Stack.Screen
+                name="About"
+                component={About}
+                options={{
+                    header: ({ navigation, scene }) => (
+                        <Header
+                            title="About"
+                            back
+                            white
+                            transparent
+                            navigation={navigation}
+                            scene={scene}
+                        />
+                    ),
+                    headerTransparent: true,
+                    headerShown: false,
+                }}
+            />
+        </Stack.Navigator>
+    );
+}
 function ProfileStack(props) {
   return (
     <Stack.Navigator initialRouteName="Profile" mode="card" headerMode="screen">
@@ -86,23 +87,7 @@ function ProfileStack(props) {
           headerTransparent: true
         }}
       />
-      <Stack.Screen
-        name="Pro"
-        component={Pro}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              title=""
-              back
-              white
-              transparent
-              navigation={navigation}
-              scene={scene}
-            />
-          ),
-          headerTransparent: true
-        }}
-      />
+
     </Stack.Navigator>
   );
 }
@@ -136,12 +121,10 @@ function AppStack(props) {
           fontWeight: "normal"
         }
       }}
-      initialRouteName="Account"
+      initialRouteName="Profile"
     >
-      <Drawer.Screen name="Components" component={ComponentsStack} />
-      <Drawer.Screen name="Articles" component={ArticlesStack} />
       <Drawer.Screen name="Profile" component={ProfileStack} />
-      <Drawer.Screen name="Account" component={AccountStack} />
+      <Drawer.Screen name="About" component={AboutStack} />
     </Drawer.Navigator>
   );
 }
@@ -156,6 +139,22 @@ export default function OnboardingStack(props) {
           headerTransparent: true
         }}
       />
+        <Stack.Screen
+            name="Account"
+            component={Register}
+            options={{
+                headerShown: false,
+                header: ({ navigation, scene }) => (
+                    <Header
+                        transparent
+                        title=""
+                        navigation={navigation}
+                        scene={scene}
+                    />
+                ),
+                headerTransparent: true
+            }}
+        />
       <Stack.Screen name="App" component={AppStack} />
     </Stack.Navigator>
   );

@@ -21,7 +21,7 @@ export default class Onboarding extends React.Component {
           <Block center style={styles.padded}>
             <Block>
               <Block middle>
-                <Image source={Images.NowLogo} style={{ width: 115, height: 124, bottom: 450, position: 'absolute' }} />
+                <Text style={{ fontFamily: 'montserrat-bold',fontSize: 80,color: theme.COLORS.WHITE,bottom: 450, position: 'absolute' }}>W</Text>
               </Block>
               <Block>
                 <Block middle>
@@ -46,7 +46,7 @@ export default class Onboarding extends React.Component {
                   shadowless
                   style={styles.button}
                   color={nowTheme.COLORS.PRIMARY}
-                  onPress={() => navigation.navigate('App')}
+                  onPress={() => navigation.navigate('Account')}
                 >
                   <Text
                     style={{ fontFamily: 'montserrat-bold', fontSize: 14 }}

@@ -43,17 +43,27 @@ class DrawerItem extends React.Component {
       case "Profile":
         return (
           <Icon
-            name="home"
+            name="user"
             family="NowExtra"
             size={18}
             color={focused ? nowTheme.COLORS.PRIMARY : "white"}
             style={{ opacity: 0.5 }}
           />
         );
+      case "About":
+        return (
+            <Icon
+                name="map"
+                family="NowExtra"
+                size={18}
+                color={focused ? nowTheme.COLORS.PRIMARY : "white"}
+                style={{ opacity: 0.5 }}
+            />
+        )
       case "Account":
         return (
           <Icon
-            name="home"
+            name="user"
             family="NowExtra"
             size={18}
             color={focused ? nowTheme.COLORS.PRIMARY : "white"}
@@ -92,11 +102,11 @@ class DrawerItem extends React.Component {
       case "LOGOUT":
         return (
           <Icon
-            name="home"
+            name="loop2"
             family="NowExtra"
             size={18}
             style={{ borderColor: "rgba(0,0,0,0.5)", opacity: 0.5 }}
-            color={focused ? nowTheme.COLORS.PRIMARY : "white"}
+            color={focused ? nowTheme.COLORS.BLACK : "white"}
           />
         );
       default:
