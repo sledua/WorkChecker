@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import {
   StyleSheet,
   ImageBackground,
@@ -8,10 +8,9 @@ import {
   Keyboard,
 } from 'react-native';
 import { Block, Checkbox, Text, Button as GaButton, theme } from 'galio-framework';
-
 import { Button, Icon, Input } from '../components';
 import { Images, nowTheme } from '../constants';
-
+import firebase from '../constants/firebase';
 const { width, height } = Dimensions.get('screen');
 
 const DismissKeyboard = ({ children }) => (
@@ -19,6 +18,15 @@ const DismissKeyboard = ({ children }) => (
 );
 
 class Register extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      phoneNumber: '',
+      code: '',
+      verificationId: null
+    };
+  };
+
   render() {
     const { navigation } = this.props;
     return (
@@ -47,7 +55,6 @@ class Register extends React.Component {
                       </Block>
 
                     </Block>
-
                     <Block flex={1} middle space="between">
                       <Block center flex={0.9}>
                         <Block flex space="between">

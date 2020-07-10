@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "Now UI React Native",
-    "slug": "now-ui-react-native",
+    "name": "Work Checker - Work remotely",
+    "slug": "Work-Checker-Work-remotely",
     "privacy": "public",
     "sdkVersion": "37.0.0",
     "platforms": [
       "ios",
       "android"
     ],
-    "version": "1.2.0",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -23,13 +23,19 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.gmail.work-checker-work-remotely",
+      "buildNumber": "0.0.1"
     },
     "packagerOpts": {
       "assetExts": [
         "ttf"
       ]
     },
-    "description": "Now UI React Native, based on Now UI Design System. Coded by Creative Tim"
+    "android": {
+      "package": "com.gmail.work_checker_work_remotely",
+      "versionCode": 1
+    },
+    "description": "Work Checker Work remotely"
   }
 }

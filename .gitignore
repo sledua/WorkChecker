@@ -9,3 +9,4 @@ yarn.lock
 *.mobileprovision
 .DS_Store
 .idea
+pas.txt
