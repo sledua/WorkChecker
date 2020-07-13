@@ -49,7 +49,7 @@ class DropDown extends React.Component {
             {this.state.value}
           </Text>
           <Icon
-            name={iconName || 'minimal-down2x'}
+            name={iconName || 'ctrl'}
             family={iconFamily || 'NowExtra'}
             size={iconSize || 10}
             color={iconColor || nowTheme.COLORS.WHITE}

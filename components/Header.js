@@ -43,7 +43,7 @@ const BasketButton = ({ isWhite, style, navigation }) => (
 class Header extends React.Component {
   handleLeftPress = () => {
     const { back, navigation } = this.props;
-    return back ? navigation.goBack() : navigation.openDrawer();
+    return back ? navigation.openDrawer() : navigation.openDrawer();
   };
   renderRight = () => {
     const { white, title, navigation } = this.props;
@@ -75,11 +75,6 @@ class Header extends React.Component {
       case 'Category':
         return [
           <BellButton key="chat-deals" navigation={navigation} isWhite={white} />,
-          <BasketButton key="basket-deals" navigation={navigation} isWhite={white} />
-        ];
-      case 'Profile':
-        return [
-          <BellButton key="chat-profile" navigation={navigation} isWhite={white} />,
           <BasketButton key="basket-deals" navigation={navigation} isWhite={white} />
         ];
       case 'Account':

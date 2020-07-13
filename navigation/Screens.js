@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 // screens
 import About from '../screens/About';
+import Add from '../screens/Add';
 import Profile from '../screens/Profile';
 import Register from '../screens/Register';
 import Components from '../screens/Components';
@@ -61,7 +62,29 @@ function AboutStack(props) {
                         />
                     ),
                     headerTransparent: true,
-                    headerShown: false,
+                }}
+            />
+        </Stack.Navigator>
+    );
+}
+function AddStack(props) {
+    return(
+        <Stack.Navigator initialRouteName="Add" mode="card" headerMode="screen">
+            <Stack.Screen
+                name="Add"
+                component={Add}
+                options={{
+                    header: ({ navigation, scene }) => (
+                        <Header
+                            title="Add user"
+                            back
+                            white
+                            transparent
+                            navigation={navigation}
+                            scene={scene}
+                        />
+                    ),
+                    headerTransparent: true,
                 }}
             />
         </Stack.Navigator>
@@ -125,6 +148,7 @@ function AppStack(props) {
     >
       <Drawer.Screen name="Profile" component={ProfileStack} />
       <Drawer.Screen name="About" component={AboutStack} />
+      <Drawer.Screen name="Add" component={AddStack} />
     </Drawer.Navigator>
   );
 }
@@ -139,21 +163,21 @@ export default function OnboardingStack(props) {
           headerTransparent: true
         }}
       />
-        <Stack.Screen
-            name="Account"
-            component={Register}
-            options={{
-                headerShown: false,
-                header: ({ navigation, scene }) => (
-                    <Header
-                        transparent
-                        title=""
-                        navigation={navigation}
-                        scene={scene}
-                    />
-                ),
-                headerTransparent: true
-            }}
+    <Stack.Screen
+        name="Account"
+        component={Register}
+        options={{
+            headerShown: false,
+            header: ({ navigation, scene }) => (
+                <Header
+                    transparent
+                    title=""
+                    navigation={navigation}
+                    scene={scene}
+                />
+            ),
+            headerTransparent: true
+        }}
         />
       <Stack.Screen name="App" component={AppStack} />
     </Stack.Navigator>

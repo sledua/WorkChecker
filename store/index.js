@@ -1,5 +1,5 @@
 import {createStore, combineReducers} from 'redux';
-import {workerReducer} from './reducers/worker'
+import {workerReducer} from './reducers/worker';
 const rootReducer = combineReducers({
     worker: workerReducer
 });

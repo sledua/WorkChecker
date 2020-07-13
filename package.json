@@ -41,7 +41,8 @@
     "@expo/vector-icons": "^10.2.0",
     "babel-eslint": "^10.0.3",
     "babel-preset-expo": "^8.2.1",
-    "redux-devtools": "^3.5.0"
+    "redux-devtools-extension": "^2.13.8",
+    "remote-redux-devtools": "^0.5.0"
   },
   "keywords": [
     "now react native",

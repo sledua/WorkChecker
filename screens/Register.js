@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React from 'react';
 import {
   StyleSheet,
   ImageBackground,
@@ -10,7 +10,6 @@ import {
 import { Block, Checkbox, Text, Button as GaButton, theme } from 'galio-framework';
 import { Button, Icon, Input } from '../components';
 import { Images, nowTheme } from '../constants';
-import firebase from '../constants/firebase';
 const { width, height } = Dimensions.get('screen');
 
 const DismissKeyboard = ({ children }) => (
