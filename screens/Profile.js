@@ -1,6 +1,6 @@
 //TODO: Кнопке работать должен забирать параметры и делать пуш в бд
 import React, {useState, useCallback, useEffect} from 'react';
-import { StyleSheet, Dimensions, ImageBackground, Alert } from 'react-native';
+import { StyleSheet, Dimensions, ImageBackground, Alert, Vibration } from 'react-native';
 import { Block, Text, theme, Button as GaButton } from 'galio-framework';
 import { Button } from '../components';
 import { Images, nowTheme } from '../constants';
@@ -13,45 +13,88 @@ const { width, height } = Dimensions.get('screen');
 const thumbMeasure = (width - 48 - 32) / 3;
 
 async function readPermissions() {
-  const {status} = await Permissions.askAsync(
-      Permissions.LOCATION,
-
-  )
-  if(status === 'granted') {
-    return Location.getCurrentPositionAsync({ enableHighAccuracy: true });
-  } else {
-    Alert.alert('Warning','Не разрешил использование геолокации')
+  const result = await Permissions.askAsync(Permissions.LOCATION)
+  if(result.status !== 'granted') {
+    Alert.alert('А я не поняв', 'Не разрешил использование геолокации', [{text: 'Добре'}]);
+    return false;
   }
-
+  return true;
 }
+
 const Profile = ({navigation}) => {
+
   const users = useSelector(state => state.worker.usersAdmin);
   const dispatch = useDispatch();
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
+
+  const [pickLocation, setPickLocation] = useState(null);
+  const [isFetching, setIsFetching] = useState(false);
   const [butn, setButn] = useState(false)
+  const [workStart, setWorkStart] = useState(false)
 
-  const toggleFlag = useCallback(async () => {
-    //butn ? setButn(true) : setButn(false)
-    const addPermissions = await readPermissions();
-    if (!addPermissions) {
-      return
+  const getLocation = async () => {
+    const hasPermission = await readPermissions();
+    if(!hasPermission)
+      {
+        return
+      }
+    try {
+      setIsFetching(true)
+      const loc = await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.High})
+      setPickLocation(
+         {
+          lat: loc.coords.latitude,
+          lgn: loc.coords.longitude
+        }
+      )
+    } catch (e) {
+      console.log(e);
+      Alert.alert('Нет подключение', 'Повторите попытку через минуту, и повторите подключение к сети', [{text: 'Добре'}])
     }
-    const phone = users.map(p => p.phone);
-    const workFlag = users.map(f => f.workFlag);
-    dispatch(updateStatus(phone,workFlag))
-  }, [])
-  useEffect(() => {
-    toggleFlag()
-  }, [toggleFlag])
-  useEffect(() => {
+    setIsFetching(false);
+  }
+  function uppInfo() {
+    setWorkStart(!workStart)
+    setButn(!butn)
+    if (workStart) {
+      const id = users.map(p => p.id);
+      const workFlag = '1'
+      getLocation().then(r => r);
+      const location = pickLocation;
+      const date = new Date();
+      const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'long',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric'
+      }
+      const formaTtimer = date.toLocaleString("uk", options);
+      const timer = {'timeStart': formaTtimer.toString()}
+      dispatch(updateUser(id, workFlag, location, timer))
+      Alert.alert('Приступая к задачи', 'Работа началась, шевелись Плотва!', [{text: 'Я не слишу?)'}])
+    } else if (!workStart) {
+      const id = users.map(p => p.id);
+      const workFlag = '0'
+      const location = pickLocation;
+      const date = new Date();
+      const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'long',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric'
+      }
+      const formaTtimer = date.toLocaleString("uk", options);
+      const timer = {'timeEnd': formaTtimer.toString()}
 
-      (async () => {
-        let location = await Location.getCurrentPositionAsync({});
-        setLocation(location);
-      })();
-
-  });
+      dispatch(updateUser(id, workFlag, location, timer))
+    }
+  }
+  console.log(workStart)
   return (
     <Block style={{
       flex: 1,
@@ -106,12 +149,14 @@ const Profile = ({navigation}) => {
               style={{ position: 'absolute', width: width, top: height * 0.3 - 22, zIndex: 99 }}
             >
               <Button style={{
-                width: 114,
-                height: 44,
-                marginHorizontal: 5,
-                elevation: 0 }} textStyle={{ fontSize: 16 }} round
-                      onPress={toggleFlag}>
-                Працюю
+                        width: 114,
+                        height: 44,
+                        marginHorizontal: 5,
+                        elevation: 0 }}
+                      textStyle={{ fontSize: 16 }} round
+                      onPress={uppInfo}
+                      >
+                {butn ? 'Не працюю' : 'Працюю' }
               </Button>
               {butn ?
               <Text p style={{backgroundColor: theme.COLORS.SUCCESS, color: theme.COLORS.WHITE}}>Використовуються Ваша геолокація,
@@ -127,14 +172,14 @@ const Profile = ({navigation}) => {
               <Text bold size={17} color="#2c2c2c">
                 Статус:
               </Text>
-              <Text size={17}>Не працюю</Text>
+              <Text size={17}>{butn ? 'В работе' : 'Не працюю' }</Text>
             </Block>
-            <Block row style={{ paddingVertical: 14, paddingHorizontal: 15 }}>
-              <Text bold size={17} color="#2c2c2c">
-                Location:
-              </Text>
-              <Text size={17}>{JSON.stringify(location)}</Text>
-            </Block>
+            {/*<Block row style={{ paddingVertical: 14, paddingHorizontal: 15 }}>*/}
+            {/*  <Text bold size={17} color="#2c2c2c">*/}
+            {/*    Location:*/}
+            {/*  </Text>*/}
+            {/*  <Text size={17}>{JSON.stringify(location)}</Text>*/}
+            {/*</Block>*/}
           </Block>
           <Block
               middle

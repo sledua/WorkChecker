@@ -25,7 +25,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.gmail.work-checker-work-remotely",
-      "buildNumber": "0.0.1"
+      "buildNumber": "0.0.2"
     },
     "packagerOpts": {
       "assetExts": [
@@ -34,7 +34,8 @@
     },
     "android": {
       "package": "com.gmail.work_checker_work_remotely",
-      "versionCode": 1
+      "versionCode": 2,
+      "permissions": ["LOCATION"]
     },
     "description": "Work Checker Work remotely"
   }

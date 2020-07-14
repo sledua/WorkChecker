@@ -16,22 +16,21 @@ export const workerReducer = (state = initialState, action) => {
 
             }
         case UPDATE_USER:
-            return  {
+            const update = state.usersAdmin.map(i => {
+                if(i.id === action.id) {
+                    i.workFlag = action.workFlag
+                    i.location = action.location
+                    i.timer = action.timer
+                }
+                return i;
+            })
+
+            return {
                 ...state,
-                usersAdmin: action.payload,
-                usersWorker: action.payload.filter( user => user.rol === 'user' )
+                usersAdmin: update
             }
         case UPDATE_STATUS:
-            const users = state.usersAdmin.map(flag => {
-                if(flag.workFlag === action.workFlag) {
-                    flag.workFlag = '1';
-                } else {
-                    flag.workFlag = '0';
-                }
 
-                return flag;
-            })
-            return {...state, users}
         case CREATE_USER:
             return {
                 ...state,
