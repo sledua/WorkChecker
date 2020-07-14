@@ -1,3 +1,4 @@
+//TODO: Кнопке работать должен забирать параметры и делать пуш в бд
 import React, {useState, useCallback, useEffect} from 'react';
 import { StyleSheet, Dimensions, ImageBackground, Alert } from 'react-native';
 import { Block, Text, theme, Button as GaButton } from 'galio-framework';

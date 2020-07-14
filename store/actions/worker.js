@@ -21,7 +21,7 @@ export const runForUsers = inputPhone => async  dispatch => {
 export const updateUser = () => async dispatch => {
 
     const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
-        {method: 'GET',
+        {method: 'POST',
             headers: {'Context-Type': 'application/json'}
         })
     const data = await response.json();
