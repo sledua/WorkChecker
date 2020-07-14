@@ -45,10 +45,10 @@ export const addUser = user => async dispatch => {
             body: JSON.stringify({user})
         })
     const data = await response.json();
-
-
+    const payload = {...user}
+    console.log(payload);
     dispatch ({
         type: CREATE_USER,
-        payload: user
+        payload
     })
 }

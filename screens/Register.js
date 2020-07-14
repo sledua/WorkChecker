@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   StyleSheet,
   ImageBackground,
@@ -20,11 +20,11 @@ const DismissKeyboard = ({ children }) => (
 const Register = ({navigation}) => {
   const dispatch = useDispatch();
   const [inputPhone, setInputPhone] = useState('')
+
   const authInApp = () => {
-    //dispatch(runForUsers())
+    dispatch(runForUsers(inputPhone))
     navigation.navigate("App")
   }
-
   return (
         <DismissKeyboard>
           <Block flex middle>
@@ -115,7 +115,7 @@ const Register = ({navigation}) => {
                                 color="primary"
                                 round
                                 style={styles.createButton}
-                                onPress={() => authInApp()}>
+                                onPress={()=>authInApp()}>
                               <Text
                                   style={{ fontFamily: 'montserrat-bold' }}
                                   size={14}

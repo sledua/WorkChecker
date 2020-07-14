@@ -36,11 +36,10 @@ const Profile = ({navigation}) => {
     if (!addPermissions) {
       return
     }
-    dispatch(updateStatus(users.map(flag => flag.workFlag)))
-  }, [dispatch])
+    //dispatch(updateStatus(users.map(flag => flag.workFlag)))
+  }, [])
   useEffect(() => {
     toggleFlag()
-    dispatch(updateUser())
   }, [toggleFlag])
   useEffect(() => {
 
@@ -50,7 +49,6 @@ const Profile = ({navigation}) => {
       })();
 
   });
-  console.log(location)
   return (
     <Block style={{
       flex: 1,
@@ -80,7 +78,7 @@ const Profile = ({navigation}) => {
                     }}
                     color='#ffffff'
                     >
-                    {users.map(i=>i.user.name)}
+                    {users.map(i=>i.name)}
                   </Text>
 
                   <Text
@@ -95,7 +93,7 @@ const Profile = ({navigation}) => {
                       opacity: .8
                     }}
                   >
-                    {users.map(r=>r.user.rol)}
+                    {users.map(r=>r.rol)}
                   </Text>
                 </Block>
               </Block>
