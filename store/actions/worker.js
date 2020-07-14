@@ -18,18 +18,23 @@ export const runForUsers = inputPhone => async  dispatch => {
     })
 }
 
-export const updateUser = () => async dispatch => {
+export const updateUser = (phone, workFlag, location) => async dispatch => {
+    try {
+        await fetch(`https://work-checker-b96e4.firebaseio.com/users/${phone}.json`,
+            {method: 'PATCH',
+                headers: {'Context-Type': 'application/json'},
+                body: JSON.stringify({workFlag, location})
+            })
 
-    const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
-        {method: 'POST',
-            headers: {'Context-Type': 'application/json'}
+        dispatch ({
+            type: UPDATE_USER,
+            workFlag,
+            location
         })
-    const data = await response.json();
-    const USERS = Object.keys(data).map(key => ({...data[key]}))
-    dispatch ({
-        type: UPDATE_USER,
-        payload: USERS
-    })
+    } catch (e) {
+        console.log(e)
+    }
+
 
 }
 export const updateStatus = workFlag => {
@@ -39,15 +44,22 @@ export const updateStatus = workFlag => {
     }
 }
 export const addUser = user => async dispatch => {
-    const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
-        {method: 'POST',
-            headers: {'Context-Type': 'application/json'},
-            body: JSON.stringify({user})
-        })
-    const data = await response.json();
-    const payload = {...user}
-    console.log(payload);
-    dispatch ({
+
+        const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
+            {method: 'POST',
+                headers: {'Context-Type': 'application/json'},
+                body: JSON.stringify({user})
+            })
+        const data = await response.json();
+        const payload = {...user, id: data.name};
+        await fetch(`https://work-checker-b96e4.firebaseio.com/users/${data.name}/user.json`,
+            {method: 'PATCH',
+                headers: {'Context-Type': 'application/json'},
+                body: JSON.stringify({id: data.name})
+            })
+
+    console.log(data.name);
+    dispatch({
         type: CREATE_USER,
         payload
     })

@@ -18,13 +18,12 @@ const Add = () =>  {
 
     const submitHandler = () => {
         const user = {
-            id: Date.now().toString(),
             name: name,
             phone: phone,
             select: 'select',
             rol: 'user',
             location: '',
-            workFlagL: '0',
+            workFlag: '0',
             timeAdd: new Date().toJSON()
         }
       dispatch(addUser(user))

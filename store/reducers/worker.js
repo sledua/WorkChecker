@@ -23,10 +23,10 @@ export const workerReducer = (state = initialState, action) => {
             }
         case UPDATE_STATUS:
             const users = state.usersAdmin.map(flag => {
-                if(flag.workFlag === action.payload) {
-                    flag.workFlag = '0';
-                } else {
+                if(flag.workFlag === action.workFlag) {
                     flag.workFlag = '1';
+                } else {
+                    flag.workFlag = '0';
                 }
 
                 return flag;
@@ -35,7 +35,7 @@ export const workerReducer = (state = initialState, action) => {
         case CREATE_USER:
             return {
                 ...state,
-                usersAdmin: [{...state.payload}, ...state.usersAdmin]
+                usersAdmin: [...state.usersAdmin,{...state.payload}]
             }
         default:
             return state;

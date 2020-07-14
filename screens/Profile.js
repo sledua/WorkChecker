@@ -37,7 +37,9 @@ const Profile = ({navigation}) => {
     if (!addPermissions) {
       return
     }
-    //dispatch(updateStatus(users.map(flag => flag.workFlag)))
+    const phone = users.map(p => p.phone);
+    const workFlag = users.map(f => f.workFlag);
+    dispatch(updateStatus(phone,workFlag))
   }, [])
   useEffect(() => {
     toggleFlag()
