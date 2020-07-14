@@ -1,16 +1,14 @@
-import User from '../model/user';
-
 const USERS = [
-    new User(
-        'p1',
-        'Gerry Tomhson',
-        '+380934666049',
-        'programmer',
-        'admin',
-        'Rovno',
-        '20.05.2020',
-        '0'
-    ),
+    {
+        id:'p1',
+        name:'Gerry Tomhson',
+        phone:'+380934666049',
+        select:'programmer',
+        rol:'admin',
+        location:'Rovno',
+        timeAdd:'20.05.2020',
+        workFlag:'0'
+    }
 ];
 
 export default USERS;

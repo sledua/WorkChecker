@@ -1,34 +1,31 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   StyleSheet,
   ImageBackground,
   Dimensions,
-  StatusBar,
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import { Block, Checkbox, Text, Button as GaButton, theme } from 'galio-framework';
+import { Block, Checkbox, Text, theme } from 'galio-framework';
 import { Button, Icon, Input } from '../components';
 import { Images, nowTheme } from '../constants';
+import {useDispatch} from "react-redux";
+import {runForUsers} from "../store/actions/worker";
 const { width, height } = Dimensions.get('screen');
 
 const DismissKeyboard = ({ children }) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>{children}</TouchableWithoutFeedback>
 );
 
-class Register extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      phoneNumber: '',
-      code: '',
-      verificationId: null
-    };
-  };
+const Register = ({navigation}) => {
+  const dispatch = useDispatch();
+  const [inputPhone, setInputPhone] = useState('')
+  const authInApp = () => {
+    //dispatch(runForUsers())
+    navigation.navigate("App")
+  }
 
-  render() {
-    const { navigation } = this.props;
-    return (
+  return (
         <DismissKeyboard>
           <Block flex middle>
             <ImageBackground
@@ -63,6 +60,7 @@ class Register extends React.Component {
                                   placeholder="+38 097 209 56 28"
                                   type="number-pad"
                                   style={styles.inputs}
+                                  onChangeText={setInputPhone}
                                   iconContent={
                                     <Icon
                                         size={16}
@@ -117,7 +115,7 @@ class Register extends React.Component {
                                 color="primary"
                                 round
                                 style={styles.createButton}
-                                onPress={() => navigation.navigate("App")}>
+                                onPress={() => authInApp()}>
                               <Text
                                   style={{ fontFamily: 'montserrat-bold' }}
                                   size={14}
@@ -137,7 +135,6 @@ class Register extends React.Component {
           </Block>
         </DismissKeyboard>
     );
-  }
 }
 
 const styles = StyleSheet.create({

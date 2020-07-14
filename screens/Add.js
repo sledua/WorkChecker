@@ -1,49 +1,40 @@
 import React, {useState, useEffect, useCallback} from "react";
 import {
   StyleSheet,
-  TouchableOpacity,
-  ScrollView, ImageBackground, Dimensions
+    Dimensions
 } from "react-native";
 import { Block, Text, theme, Icon, Input, Button } from "galio-framework";
-import {Images} from "../constants";
 import Select from "../components/Select";
 import {useDispatch} from "react-redux";
 import {addUser} from "../store/actions/worker";
 
 const { width, height } = Dimensions.get('screen');
 
-const Add = props =>  {
+const Add = () =>  {
     const dispatch = useDispatch();
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
-    const [select, setSelect] = useState('');
-    const submitHandler = useCallback(() => {
-        const users = {
-            id: '',
+    const [select, setSelect] = useState(1);
+
+    const submitHandler = () => {
+        const user = {
+            id: Date.now().toString(),
             name: name,
             phone: phone,
-            select: select,
+            select: 'select',
             rol: 'user',
             location: '',
             workFlagL: '0',
             timeAdd: new Date().toJSON()
         }
-      dispatch(addUser(users))
-    }, []);
-    useEffect(() => {
-
-    })
+      dispatch(addUser(user))
+    };
     return (
         <Block style={{
           flex: 1,
           flexDirection: 'column',
           justifyContent: 'space-between',
         }} >
-          <ImageBackground
-              source={Images.ProfileBackground}
-              style={styles.profileContainer}
-              imageStyle={styles.profileBackground}
-          >
             <Block style={{ paddingHorizontal: 20,position: 'absolute', top: width * 0.3, width: width}}>
               <Text>Name</Text>
               <Input
@@ -59,18 +50,19 @@ const Add = props =>  {
                   placeholderTextColor="#4F8EC9"
                   onChangeText={setPhone}/>
               <Text>Select value</Text>
-              <Select
-                  defaultIndex={1}
-                  options={[1, 2, 3, 4, 5]}
-                  style={styles.shadow}
-              />
+              {/*<Select*/}
+              {/*    defaultIndex={1}*/}
+              {/*    options={[1, 2, 3, 4, 5]}*/}
+              {/*    style={styles.shadow}*/}
+              {/*/>*/}
               <Button
                   color="#50C7C7"
                   shadowless
-                  onPress={() => submitHandler()}>
+                  onPress={submitHandler}
+                    disabled={!name && !phone}>
                 Добавить пользователя</Button>
             </Block>
-          </ImageBackground>
+
         </Block>
     );
 }

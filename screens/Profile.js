@@ -1,28 +1,56 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import { FlatList, StyleSheet, Dimensions, ScrollView, Image, ImageBackground, Platform } from 'react-native';
+import { StyleSheet, Dimensions, ImageBackground, Alert } from 'react-native';
 import { Block, Text, theme, Button as GaButton } from 'galio-framework';
 import { Button } from '../components';
 import { Images, nowTheme } from '../constants';
-import { HeaderHeight } from '../constants/utils';
 import {useSelector, useDispatch} from "react-redux";
-import {updateStatus} from '../store/actions/worker';
-
+import {updateStatus, updateUser} from '../store/actions/worker';
+import * as Location from 'expo-location';
+import * as Permissions from 'expo-permissions';
 const { width, height } = Dimensions.get('screen');
 
 const thumbMeasure = (width - 48 - 32) / 3;
 
+async function readPermissions() {
+  const {status} = await Permissions.askAsync(
+      Permissions.LOCATION,
+
+  )
+  if(status === 'granted') {
+    return Location.getCurrentPositionAsync({ enableHighAccuracy: true });
+  } else {
+    Alert.alert('Warning','Не разрешил использование геолокации')
+  }
+
+}
 const Profile = ({navigation}) => {
   const users = useSelector(state => state.worker.usersAdmin);
   const dispatch = useDispatch();
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
   const [butn, setButn] = useState(false)
 
-  const toggleFlag = useCallback(() => {
-    console.log(users)
+  const toggleFlag = useCallback(async () => {
+    //butn ? setButn(true) : setButn(false)
+    const addPermissions = await readPermissions();
+    if (!addPermissions) {
+      return
+    }
     dispatch(updateStatus(users.map(flag => flag.workFlag)))
   }, [dispatch])
   useEffect(() => {
     toggleFlag()
+    dispatch(updateUser())
   }, [toggleFlag])
+  useEffect(() => {
+
+      (async () => {
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+      })();
+
+  });
+  console.log(location)
   return (
     <Block style={{
       flex: 1,
@@ -52,7 +80,7 @@ const Profile = ({navigation}) => {
                     }}
                     color='#ffffff'
                     >
-                    {users.map(name => name.name)}
+                    {users.map(i=>i.user.name)}
                   </Text>
 
                   <Text
@@ -67,7 +95,7 @@ const Profile = ({navigation}) => {
                       opacity: .8
                     }}
                   >
-                    {users.map(rol => rol.rol)}
+                    {users.map(r=>r.user.rol)}
                   </Text>
                 </Block>
               </Block>
@@ -81,10 +109,7 @@ const Profile = ({navigation}) => {
                 height: 44,
                 marginHorizontal: 5,
                 elevation: 0 }} textStyle={{ fontSize: 16 }} round
-                      onPress={() => {
-                        toggleFlag()
-                        !butn ? setButn(true) : setButn(false)
-                      }}>
+                      onPress={toggleFlag}>
                 Працюю
               </Button>
               {butn ?
@@ -107,7 +132,7 @@ const Profile = ({navigation}) => {
               <Text bold size={17} color="#2c2c2c">
                 Location:
               </Text>
-              <Text size={17}>Adres</Text>
+              <Text size={17}>{JSON.stringify(location)}</Text>
             </Block>
           </Block>
           <Block
