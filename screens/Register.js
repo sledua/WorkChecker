@@ -4,25 +4,58 @@ import {
   ImageBackground,
   Dimensions,
   TouchableWithoutFeedback,
-  Keyboard,
+  Keyboard, Alert,
 } from 'react-native';
 import { Block, Checkbox, Text, theme } from 'galio-framework';
 import { Button, Icon, Input } from '../components';
 import { Images, nowTheme } from '../constants';
 import {useDispatch} from "react-redux";
 import {runForUsers} from "../store/actions/worker";
+
+import * as Permissions from 'expo-permissions';
+import * as Notifications from 'expo-notifications';
 const { width, height } = Dimensions.get('screen');
 
 const DismissKeyboard = ({ children }) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>{children}</TouchableWithoutFeedback>
 );
+const firebaseConfig = {
+  apiKey: "AIzaSyAc2265y__KIgMYtFeosl_KvDTeP92SmkY",
+  authDomain: "work-checker-b96e4.firebaseapp.com",
+  databaseURL: "https://work-checker-b96e4.firebaseio.com",
+  projectId: "work-checker-b96e4",
+  storageBucket: "work-checker-b96e4.appspot.com",
+  messagingSenderId: "86335408325",
+  appId: "1:86335408325:web:e48367964c3281a3ac08ac",
+  measurementId: "G-PBCRZGJ2Q2"
+};
 
 const Register = ({navigation}) => {
+
   const dispatch = useDispatch();
   const [inputPhone, setInputPhone] = useState('')
 
+  // firebase.initializeApp(firebaseConfig);
+
+  const registerForPushNotifications = async () => {
+    const {status} = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+    let finalStatus = status;
+
+    if(status !== 'granted') {
+      const {status} = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+    if(finalStatus !== 'granted'){return; }
+
+    let token = await Notifications.getExpoPushTokenAsync();
+    console.log(token);
+  }
+  // useEffect(() => {
+  //   registerForPushNotifications()
+  // },[registerForPushNotifications])
   const authInApp = () => {
     dispatch(runForUsers(inputPhone))
+
     navigation.navigate("App")
   }
   return (

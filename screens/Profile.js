@@ -1,4 +1,3 @@
-//TODO: Кнопке работать должен забирать параметры и делать пуш в бд
 import React, {useState, useCallback, useEffect} from 'react';
 import { StyleSheet, Dimensions, ImageBackground, Alert, Vibration } from 'react-native';
 import { Block, Text, theme, Button as GaButton } from 'galio-framework';
@@ -181,6 +180,22 @@ const Profile = ({navigation}) => {
             {/*  <Text size={17}>{JSON.stringify(location)}</Text>*/}
             {/*</Block>*/}
           </Block>
+        <Block
+            middle
+            row
+            style={{zIndex: 99}}
+        >
+          <Button style={{
+            height: 44,
+            marginHorizontal: 5,
+            marginVertical: 10,
+            elevation: 0 }}
+                  textStyle={{ fontSize: 16 }}
+                  round
+                  >
+            Добавить рабочую область
+          </Button>
+        </Block>
           <Block
               middle
               row
@@ -193,7 +208,7 @@ const Profile = ({navigation}) => {
               textStyle={{ fontSize: 16 }}
               round
               onPress={() => navigation.navigate('Add')}>
-              In panel
+              Добавить сотрудника
             </Button>
           </Block>
       </Block>

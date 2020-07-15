@@ -21,7 +21,7 @@ const Add = () =>  {
             name: name,
             phone: phone,
             select: 'select',
-            rol: 'user',
+            rol: 'сотрудник',
             location: '',
             workFlag: '0',
             timeAdd: new Date().toJSON()
