@@ -1,17 +1,17 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import {Dimensions, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import ModalDropdown from 'react-native-modal-dropdown';
 import { Block, Text } from 'galio-framework';
-
+const { width, height } = Dimensions.get('screen');
 import Icon from './Icon';
 import { nowTheme } from '../constants';
 
 class DropDown extends React.Component {
-  state = {
-    value: 1
-  };
 
+  state = {
+    value: 'Уборка в саду'
+  };
   handleOnSelect = (index, value) => {
     const { onSelect } = this.props;
 
@@ -71,7 +71,7 @@ DropDown.propTypes = {
 
 const styles = StyleSheet.create({
   qty: {
-    width: 100,
+    width: width * 0.9,
     backgroundColor: nowTheme.COLORS.DEFAULT,
     paddingHorizontal: 16,
     paddingTop: 10,
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   dropdown: {
     marginTop: 8,
     marginLeft: -16,
-    width: 100
+    width: width * 0.9
   }
 });
 

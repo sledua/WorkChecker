@@ -1,3 +1,4 @@
+//TODO: update state in reducer!!
 import React, {useState, useCallback, useEffect} from 'react';
 import { StyleSheet, Dimensions, ImageBackground, Alert, Vibration } from 'react-native';
 import { Block, Text, theme, Button as GaButton } from 'galio-framework';
@@ -7,6 +8,7 @@ import {useSelector, useDispatch} from "react-redux";
 import {updateStatus, updateUser} from '../store/actions/worker';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
+import {formatTimer} from "../model/timerDate";
 const { width, height } = Dimensions.get('screen');
 
 const thumbMeasure = (width - 48 - 32) / 3;
@@ -28,7 +30,7 @@ const Profile = ({navigation}) => {
   const [pickLocation, setPickLocation] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
   const [butn, setButn] = useState(false)
-  const [workStart, setWorkStart] = useState(false)
+  const [workStart, setWorkStart] = useState(null)
 
   const getLocation = async () => {
     const hasPermission = await readPermissions();
@@ -51,49 +53,35 @@ const Profile = ({navigation}) => {
     }
     setIsFetching(false);
   }
-  function uppInfo() {
-    setWorkStart(!workStart)
-    setButn(!butn)
-    if (workStart) {
-      const id = users.map(p => p.id);
-      const workFlag = '1'
-      getLocation().then(r => r);
-      const location = pickLocation;
-      const date = new Date();
-      const options = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        weekday: 'long',
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric'
-      }
-      const formaTtimer = date.toLocaleString("uk", options);
-      const timer = {'timeStart': formaTtimer.toString()}
-      dispatch(updateUser(id, workFlag, location, timer))
-      Alert.alert('Приступая к задачи', 'Работа началась, шевелись Плотва!', [{text: 'Я не слишу?)'}])
-    } else if (!workStart) {
-      const id = users.map(p => p.id);
-      const workFlag = '0'
-      const location = pickLocation;
-      const date = new Date();
-      const options = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        weekday: 'long',
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric'
-      }
-      const formaTtimer = date.toLocaleString("uk", options);
-      const timer = {'timeEnd': formaTtimer.toString()}
-
-      dispatch(updateUser(id, workFlag, location, timer))
+  useEffect( () => {
+    getLocation().then(r => r);
+    const rr = users.map(f=>f.workFlag.toString())
+    checkStatus(rr);
+    console.log( rr, butn, checkStatus);
+  },[])
+  function checkStatus(rr) {
+    if (rr == 0) {
+      setButn(false)
+    } else {
+      setButn(true)
     }
   }
-  console.log(workStart)
+  const workUpdater = useCallback(() =>{
+    const id = users.map(p => p.id);
+    const location = pickLocation;
+    const timer = {'timeStart': formatTimer.toString()}
+    const rr = users.map(f=>f.workFlag.toString())
+    if(rr == 0) {
+      Alert.alert('Приступая к задачи', 'Работа началась, шевелись Плотва!', [{text: 'Ok'}])
+      const workFlag = '1'
+      dispatch(updateUser(id, workFlag, location, timer))
+    } else {
+      Alert.alert('Stop', 'Bu pp', [{text: 'Ok'}])
+      const workFlag = '0'
+      dispatch(updateUser(id, workFlag, location, timer))
+    }
+    console.log(rr)
+  },[])
   return (
     <Block style={{
       flex: 1,
@@ -106,7 +94,7 @@ const Profile = ({navigation}) => {
           style={styles.profileContainer}
           imageStyle={styles.profileBackground}
         >
-          <Block flex style={styles.profileCard}>
+          <Block flex>
             <Block style={{
               position: 'absolute',
               width: width,
@@ -153,7 +141,7 @@ const Profile = ({navigation}) => {
                         marginHorizontal: 5,
                         elevation: 0 }}
                       textStyle={{ fontSize: 16 }} round
-                      onPress={uppInfo}
+                       onPress={workUpdater}
                       >
                 {butn ? 'Не працюю' : 'Працюю' }
               </Button>
@@ -173,12 +161,6 @@ const Profile = ({navigation}) => {
               </Text>
               <Text size={17}>{butn ? 'В работе' : 'Не працюю' }</Text>
             </Block>
-            {/*<Block row style={{ paddingVertical: 14, paddingHorizontal: 15 }}>*/}
-            {/*  <Text bold size={17} color="#2c2c2c">*/}
-            {/*    Location:*/}
-            {/*  </Text>*/}
-            {/*  <Text size={17}>{JSON.stringify(location)}</Text>*/}
-            {/*</Block>*/}
           </Block>
         <Block
             middle

@@ -53,10 +53,10 @@ const Register = ({navigation}) => {
   // useEffect(() => {
   //   registerForPushNotifications()
   // },[registerForPushNotifications])
-  const authInApp = () => {
-    dispatch(runForUsers(inputPhone))
+  const authInApp = async () => {
+    await dispatch(runForUsers(inputPhone))
 
-    navigation.navigate("App")
+    await navigation.navigate("App")
   }
   return (
         <DismissKeyboard>
@@ -148,7 +148,7 @@ const Register = ({navigation}) => {
                                 color="primary"
                                 round
                                 style={styles.createButton}
-                                onPress={()=>authInApp()}>
+                                onPress={authInApp}>
                               <Text
                                   style={{ fontFamily: 'montserrat-bold' }}
                                   size={14}

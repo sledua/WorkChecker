@@ -25,10 +25,7 @@ export const workerReducer = (state = initialState, action) => {
                 return i;
             })
 
-            return {
-                ...state,
-                usersAdmin: update
-            }
+            return {...state, ...state.usersAdmin[update]}
         case UPDATE_STATUS:
 
         case CREATE_USER:

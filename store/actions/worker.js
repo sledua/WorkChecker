@@ -20,13 +20,11 @@ export const runForUsers = inputPhone => async  dispatch => {
 
 export const updateUser = (id, workFlag, location, timer) => async dispatch => {
     try {
-
         await fetch(`https://work-checker-b96e4.firebaseio.com/users/${id}/user.json`,
             {method: 'PATCH',
                 headers: {'Context-Type': 'application/json'},
                 body: JSON.stringify({workFlag, location, timer})
             })
-
         dispatch ({
             type: UPDATE_USER,
             id,
