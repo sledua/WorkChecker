@@ -16,18 +16,16 @@ export const workerReducer = (state = initialState, action) => {
 
             }
         case UPDATE_USER:
-            const update = state.usersAdmin.map(i => {
-                if(i.id === action.id) {
+            const usersAdmin = state.usersAdmin.map(i => {
                     i.workFlag = action.workFlag
                     i.location = action.location
                     i.timer = action.timer
+                return i
                 }
-                return i;
-            })
 
-            return {...state, ...state.usersAdmin[update]}
-        case UPDATE_STATUS:
+            )
 
+            return {...state, usersAdmin}
         case CREATE_USER:
             return {
                 ...state,

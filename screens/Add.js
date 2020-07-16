@@ -33,7 +33,7 @@ const Add = () =>  {
             rol: 'сотрудник',
             location: '',
             workFlag: '0',
-            timeAdd: formatTimer.toString()
+            timeAdd: formatTimer
         }
       dispatch(addUser(user))
     };

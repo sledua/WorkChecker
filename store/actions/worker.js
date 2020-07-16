@@ -38,12 +38,6 @@ export const updateUser = (id, workFlag, location, timer) => async dispatch => {
 
 
 }
-export const updateStatus = workFlag => {
-    return {
-        type: UPDATE_STATUS,
-        payload: workFlag
-    }
-}
 export const addUser = user => async dispatch => {
 
         const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',

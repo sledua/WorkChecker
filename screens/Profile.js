@@ -53,11 +53,13 @@ const Profile = ({navigation}) => {
     }
     setIsFetching(false);
   }
+
+  const rr = users.map(f=>f.workFlag.toString())
+  console.log(rr);
   useEffect( () => {
     getLocation().then(r => r);
-    const rr = users.map(f=>f.workFlag.toString())
     checkStatus(rr);
-    console.log( rr, butn, checkStatus);
+    console.log( rr, butn);
   },[])
   function checkStatus(rr) {
     if (rr == 0) {
@@ -67,20 +69,26 @@ const Profile = ({navigation}) => {
     }
   }
   const workUpdater = useCallback(() =>{
+
     const id = users.map(p => p.id);
     const location = pickLocation;
     const timer = {'timeStart': formatTimer.toString()}
     const rr = users.map(f=>f.workFlag.toString())
+
+    console.log(users)
     if(rr == 0) {
+      setButn(true)
       Alert.alert('Приступая к задачи', 'Работа началась, шевелись Плотва!', [{text: 'Ok'}])
       const workFlag = '1'
       dispatch(updateUser(id, workFlag, location, timer))
     } else {
+      setButn(false)
       Alert.alert('Stop', 'Bu pp', [{text: 'Ok'}])
       const workFlag = '0'
+      const timer = {'timeStop': formatTimer.toString()}
       dispatch(updateUser(id, workFlag, location, timer))
     }
-    console.log(rr)
+
   },[])
   return (
     <Block style={{

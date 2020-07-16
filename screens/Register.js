@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {
   StyleSheet,
   ImageBackground,
@@ -11,31 +11,26 @@ import { Button, Icon, Input } from '../components';
 import { Images, nowTheme } from '../constants';
 import {useDispatch} from "react-redux";
 import {runForUsers} from "../store/actions/worker";
-
+import firebase from "../firebase";
+import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 import * as Permissions from 'expo-permissions';
 import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 const { width, height } = Dimensions.get('screen');
 
 const DismissKeyboard = ({ children }) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>{children}</TouchableWithoutFeedback>
 );
-const firebaseConfig = {
-  apiKey: "AIzaSyAc2265y__KIgMYtFeosl_KvDTeP92SmkY",
-  authDomain: "work-checker-b96e4.firebaseapp.com",
-  databaseURL: "https://work-checker-b96e4.firebaseio.com",
-  projectId: "work-checker-b96e4",
-  storageBucket: "work-checker-b96e4.appspot.com",
-  messagingSenderId: "86335408325",
-  appId: "1:86335408325:web:e48367964c3281a3ac08ac",
-  measurementId: "G-PBCRZGJ2Q2"
-};
 
 const Register = ({navigation}) => {
 
   const dispatch = useDispatch();
-  const [inputPhone, setInputPhone] = useState('')
+  const [inputPhone, setInputPhone] = useState('+')
+  const [code, setCode] = useState('');
+  const [verificationId, setVerificationId] = useState(null);
+  const recaptchaVerifier = useRef(null);
 
-  // firebase.initializeApp(firebaseConfig);
+  console.log(verificationId)
 
   const registerForPushNotifications = async () => {
     const {status} = await Permissions.getAsync(Permissions.NOTIFICATIONS);
@@ -54,10 +49,41 @@ const Register = ({navigation}) => {
   //   registerForPushNotifications()
   // },[registerForPushNotifications])
   const authInApp = async () => {
+    const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
+        {
+          method: 'GET',
+          headers: {'Context-Type': 'application/json'}
+        })
+    const data = await response.json();
+    const allUsers = Object.keys(data).map(key => ({...data[key].user}))
+    const onlyPhone = allUsers.map(p=>p.phone);
+    const r = onlyPhone.toString();
+    console.log(onlyPhone, r);
+    if(r !== inputPhone) {
+        Alert.alert('Ops','No phone in data base')
+    } else {
+      Alert.alert('Ok','Await sms')
+      const phoneProvider = new firebase.auth.PhoneAuthProvider();
+      phoneProvider
+          .verifyPhoneNumber(inputPhone, recaptchaVerifier.current)
+          .then(setVerificationId);
+    }
     await dispatch(runForUsers(inputPhone))
-
-    await navigation.navigate("App")
+    //
   }
+  const confirmCode = async () => {
+    const credential = await firebase.auth.PhoneAuthProvider.credential(
+        verificationId,
+        code
+    );
+    await firebase
+        .auth()
+        .signInWithCredential(credential)
+        .then((result) => {
+          console.log(result);
+        });
+    await navigation.navigate("App")
+  };
   return (
         <DismissKeyboard>
           <Block flex middle>
@@ -66,6 +92,10 @@ const Register = ({navigation}) => {
                 style={styles.imageBackgroundContainer}
                 imageStyle={styles.imageBackground}
             >
+              <FirebaseRecaptchaVerifierModal
+                  ref={recaptchaVerifier}
+                  firebaseConfig={Constants.manifest.extra.firebase}
+              />
               <Block flex middle>
                 <Block style={styles.registerContainer}>
                   <Block flex space="evenly">
@@ -92,6 +122,7 @@ const Register = ({navigation}) => {
                               <Input
                                   placeholder="+38 097 209 56 28"
                                   type="number-pad"
+                                  autoCompleteType="tel"
                                   style={styles.inputs}
                                   onChangeText={setInputPhone}
                                   iconContent={
@@ -108,9 +139,9 @@ const Register = ({navigation}) => {
                             <Block width={width * 0.8} style={{ marginBottom: 5 }}>
                               <Input
                                   placeholder="Пароль"
-                                  password
                                   viewPass
                                   style={styles.inputs}
+                                  onChangeText={setCode}
                                   iconContent={
                                     <Icon
                                         size={16}
@@ -155,6 +186,21 @@ const Register = ({navigation}) => {
                                   color={nowTheme.COLORS.WHITE}
                               >
                                 Відправити пароль
+                              </Text>
+                            </Button>
+                          </Block>
+                          <Block center>
+                            <Button
+                                color="primary"
+                                round
+                                style={styles.createButton}
+                                onPress={confirmCode}>
+                              <Text
+                                  style={{ fontFamily: 'montserrat-bold' }}
+                                  size={14}
+                                  color={nowTheme.COLORS.WHITE}
+                              >
+                                Вход
                               </Text>
                             </Button>
                           </Block>
