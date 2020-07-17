@@ -54,7 +54,7 @@ const Profile = ({navigation}) => {
     setIsFetching(false);
   }
 
-  const rr = users.map(f=>f.workFlag.toString())
+  const rr = users.map(f=>f.workFlag)
   console.log(rr);
   useEffect( () => {
     getLocation().then(r => r);
@@ -72,8 +72,8 @@ const Profile = ({navigation}) => {
 
     const id = users.map(p => p.id);
     const location = pickLocation;
-    const timer = {'timeStart': formatTimer.toString()}
-    const rr = users.map(f=>f.workFlag.toString())
+    const timer = {'timeStart': formatTimer}
+    const rr = users.map(f=>f.workFlag)
 
     console.log(users)
     if(rr == 0) {
@@ -85,7 +85,7 @@ const Profile = ({navigation}) => {
       setButn(false)
       Alert.alert('Stop', 'Bu pp', [{text: 'Ok'}])
       const workFlag = '0'
-      const timer = {'timeStop': formatTimer.toString()}
+      const timer = {'timeStop': formatTimer}
       dispatch(updateUser(id, workFlag, location, timer))
     }
 

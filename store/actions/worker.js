@@ -1,6 +1,7 @@
 export const CREATE_USER = 'CREATE_PRODUCT';
 export const UPDATE_USER = 'UPDATE_USER';
 export const RUN_FOR_USERS = 'RUN_FOR_USERS';
+export const ADD_PLACE = 'ADD_PLACE';
 export const LOGIN = 'LOGIN';
 
 export const loginUser = verificationId => async dispatch => {
@@ -45,22 +46,38 @@ export const updateUser = (id, workFlag, location, timer) => async dispatch => {
 
 
 }
+export const addPlace = users_area => async  dispatch => {
+    const response = await fetch('https://work-checker-b96e4.firebaseio.com/users_area.json',
+        {method: 'POST',
+            headers: {'Context-Type': 'application/json'},
+            body: JSON.stringify({users_area})
+        })
+    const data = await response.json();
+    const payload = {...users_area, id: data.name};
+    await fetch(`https://work-checker-b96e4.firebaseio.com/users_area/${data.name}/user.json`,
+        {method: 'PATCH',
+            headers: {'Context-Type': 'application/json'},
+            body: JSON.stringify({id: data.name})
+        })
+    dispatch({
+        type: ADD_PLACE,
+        payload
+    })
+}
 export const addUser = user => async dispatch => {
 
-        const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
-            {method: 'POST',
-                headers: {'Context-Type': 'application/json'},
-                body: JSON.stringify({user})
-            })
-        const data = await response.json();
-        const payload = {...user, id: data.name};
-        await fetch(`https://work-checker-b96e4.firebaseio.com/users/${data.name}/user.json`,
-            {method: 'PATCH',
-                headers: {'Context-Type': 'application/json'},
-                body: JSON.stringify({id: data.name})
-            })
-
-    console.log(data.name);
+    const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
+        {method: 'POST',
+            headers: {'Context-Type': 'application/json'},
+            body: JSON.stringify({user})
+        })
+    const data = await response.json();
+    const payload = {...user, id: data.name};
+    await fetch(`https://work-checker-b96e4.firebaseio.com/users/${data.name}/user.json`,
+        {method: 'PATCH',
+            headers: {'Context-Type': 'application/json'},
+            body: JSON.stringify({id: data.name})
+        })
     dispatch({
         type: CREATE_USER,
         payload

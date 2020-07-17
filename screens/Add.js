@@ -3,8 +3,7 @@ import {
   StyleSheet,
     Dimensions
 } from "react-native";
-import { Block, Text, Input, Button, theme} from "galio-framework";
-import Select from "../components/Select";
+import { Block, Text, Input, Button, theme, Toast} from "galio-framework";
 import {useDispatch, useSelector} from "react-redux";
 import {addUser} from "../store/actions/worker";
 import {formatTimer} from "../model/timerDate";
@@ -14,19 +13,26 @@ import ModalDropdown from "react-native-modal-dropdown";
 
 const { width, height } = Dimensions.get('screen');
 
-const Add = () =>  {
+const Add = ({navigation}) =>  {
     const dispatch = useDispatch();
     const users = useSelector(state => state.worker.usersAdmin);
+    const users_area = useSelector(state => state.worker.usersArea);
+    const adminPhone = users.map(phone => phone.phone);
+    const users_value = users_area.map(value => value.title);
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [valueInBase, setValueInBase] = useState(['1Уборка в саду', '2Уборка в саду', '3Уборка в саду', '4Уборка в саду', '5Уборка в саду'])
     const [value, setValue] = useState('');
-    const adminPhone = users.map(phone => phone.phone);
+    const [isShow, setShow] = useState(false)
+    useEffect(()=>{
+        setValueInBase(users_value)
+    },[])
     console.log(value);
     const handleOnSelect = (index, value) => {
         setValue(valueInBase[index])
     }
-    const submitHandler = () => {
+    const submitHandler = async () => {
+        setShow(true)
         const user = {
             phoneAdmin: adminPhone,
             name: name,
@@ -37,7 +43,9 @@ const Add = () =>  {
             workFlag: '0',
             timeAdd: formatTimer
         }
-      dispatch(addUser(user))
+      await dispatch(addUser(user))
+        await setShow(false)
+        await navigation.navigate('Profile')
     };
     return (
         <Block style={styles.profileBackground} >
@@ -51,7 +59,6 @@ const Add = () =>  {
                 <Text color={theme.COLORS.WHITE} size={18} bold>Телефон сотрудника</Text>
                 <Input
                   placeholder='+380934666049'
-                  type="number-pad"
                   placeholderTextColor="#4F8EC9"
                   color={theme.COLORS.BLACK}
                   onChangeText={setPhone}/>
@@ -68,11 +75,13 @@ const Add = () =>  {
                         </Text>
                     </Block>
                 </ModalDropdown>
+                <Toast isShow={isShow} positionIndicator="center" color="success">Новый сотрудник добавлен</Toast>
                     <Button
                         shadowless
                         style={{marginTop: height * 0.48}}
                         onPress={submitHandler}
-                        disabled={!name && !phone && !value}>
+                        disabled={!name && !phone && !value}
+                        >
                         Добавить пользователя
                     </Button>
             </Block>

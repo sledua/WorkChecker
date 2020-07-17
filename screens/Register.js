@@ -26,12 +26,11 @@ const Register = ({navigation}) => {
 
   const dispatch = useDispatch();
   const tokens = useSelector(state => state.worker.usersAdmin);
-  const [inputPhone, setInputPhone] = useState('+')
+  const [inputPhone, setInputPhone] = useState('')
   const [code, setCode] = useState('');
   const [verificationId, setVerificationId] = useState(null);
   const recaptchaVerifier = useRef(null);
 
-  console.log(verificationId)
   const userToken = tokens.toString();
   console.log('userToken',userToken);
   const registerForPushNotifications = async () => {
@@ -51,6 +50,7 @@ const Register = ({navigation}) => {
   //   registerForPushNotifications()
   // },[registerForPushNotifications])
   const authInApp = async () => {
+    await dispatch(runForUsers(inputPhone))
     const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
         {
           method: 'GET',
@@ -61,7 +61,7 @@ const Register = ({navigation}) => {
     const onlyPhone = allUsers.map(p=>p.phone);
     const r = onlyPhone.toString();
     console.log(onlyPhone, r);
-    if(r !== inputPhone) {
+    if(inputPhone !== r) {
         Alert.alert('Ops','No phone in data base')
     } else {
       Alert.alert('Ok','Await sms')
@@ -70,20 +70,20 @@ const Register = ({navigation}) => {
           .verifyPhoneNumber(inputPhone, recaptchaVerifier.current)
           .then(setVerificationId);
     }
-    await dispatch(runForUsers(inputPhone))
+
   }
   const confirmCode = async () => {
-    // const credential = await firebase.auth.PhoneAuthProvider.credential(
-    //     verificationId,
-    //     code
-    // );
-    // await firebase
-    //     .auth()
-    //     .signInWithCredential(credential)
-    //     .then((result) => {
-    //       console.log(result);
-    //     });
-    // await dispatch(loginUser(verificationId))
+    const credential = await firebase.auth.PhoneAuthProvider.credential(
+        verificationId,
+        code
+    );
+    await firebase
+        .auth()
+        .signInWithCredential(credential)
+        .then((result) => {
+          console.log(result);
+        });
+    await dispatch(loginUser(verificationId))
     await navigation.navigate("App")
   };
   return (
@@ -123,7 +123,6 @@ const Register = ({navigation}) => {
                             <Block width={width * 0.8} style={{ marginBottom: 5 }}>
                               <Input
                                   placeholder="+38 097 209 56 28"
-                                  type="number-pad"
                                   autoCompleteType="tel"
                                   style={styles.inputs}
                                   onChangeText={setInputPhone}

@@ -1,8 +1,8 @@
 import React, {useState, useEffect, useCallback} from "react";
 import {StyleSheet, Dimensions, ActivityIndicator, Alert} from "react-native";
-import {Block, Text, Input, Button, theme} from "galio-framework";
-import {useDispatch} from "react-redux";
-import {addUser} from "../store/actions/worker";
+import {Block, Text, Input, Button, theme, Toast} from "galio-framework";
+import {useDispatch,useSelector} from "react-redux";
+import {addPlace, addUser} from "../store/actions/worker";
 import {formatTimer} from "../model/timerDate";
 import MapPreview from "../components/MapPreview";
 import * as Location from "expo-location";
@@ -10,21 +10,27 @@ import * as Location from "expo-location";
 const { width, height } = Dimensions.get('screen');
 
 const AddArea = ({navigation, route}) =>  {
-
+    const users = useSelector(state => state.worker.usersAdmin);
     //const dispatch = useDispatch();
     const [workTitle, setWorkTitle] = useState('');
     const [descriptions, setDescriptions] = useState('');
     const [workPlace, setWorkPlace] = useState('');
     const [isFetching, setIsFetching] = useState(false);
     const [pickLocation, setPickLocation] = useState();
-    const submitHandler = () => {
+    const [isShow, setShow] = useState(false)
+    const adminPhone = users.map(phone => phone.phone);
+    const submitHandler = async () => {
+        setShow(true)
         const users_area = {
+            phoneAdmin: adminPhone,
             title: workTitle,
             descriptions: descriptions,
-            place: workPlace,
+            place: pickLocation,
             timeAdd: formatTimer
         }
-        //dispatch(addUser(users_area))
+        await dispatch(addPlace(users_area))
+        setShow(false)
+        await navigation.navigate('Profile')
     };
 
     const userPikedLocation = route.params ? route.params.pickedLocation : null;
@@ -100,7 +106,7 @@ const AddArea = ({navigation, route}) =>  {
                     disabled={!setWorkTitle && !setDescriptions && workPlace}>
                     Добавить</Button>
             </Block>
-
+            <Toast isShow={isShow} positionIndicator="center" color="success">Новый сотрудник добавлен</Toast>
         </Block>
     );
 }
