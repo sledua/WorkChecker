@@ -31,7 +31,7 @@ const Register = ({navigation}) => {
   const [verificationId, setVerificationId] = useState(null);
   const recaptchaVerifier = useRef(null);
 
-  const userToken = tokens.toString();
+  const userToken = tokens;
   console.log('userToken',userToken);
   const registerForPushNotifications = async () => {
     const {status} = await Permissions.getAsync(Permissions.NOTIFICATIONS);
@@ -50,7 +50,7 @@ const Register = ({navigation}) => {
   //   registerForPushNotifications()
   // },[registerForPushNotifications])
   const authInApp = async () => {
-    await dispatch(runForUsers(inputPhone))
+
     const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
         {
           method: 'GET',
@@ -70,20 +70,21 @@ const Register = ({navigation}) => {
           .verifyPhoneNumber(inputPhone, recaptchaVerifier.current)
           .then(setVerificationId);
     }
-
+    await dispatch(runForUsers(inputPhone))
   }
   const confirmCode = async () => {
-    const credential = await firebase.auth.PhoneAuthProvider.credential(
-        verificationId,
-        code
-    );
-    await firebase
-        .auth()
-        .signInWithCredential(credential)
-        .then((result) => {
-          console.log(result);
-        });
-    await dispatch(loginUser(verificationId))
+    // const credential = await firebase.auth.PhoneAuthProvider.credential(
+    //     verificationId,
+    //     code
+    // );
+    // await firebase
+    //     .auth()
+    //     .signInWithCredential(credential)
+    //     .then((result) => {
+    //       console.log(result);
+    //     });
+    //await dispatch(loginUser(verificationId))
+    await dispatch(runForUsers(inputPhone))
     await navigation.navigate("App")
   };
   return (
