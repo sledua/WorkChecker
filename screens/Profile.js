@@ -94,109 +94,23 @@ const Profile = ({navigation}) => {
     const id = users.map(p => p.id);
     const location = pickLocation;
     const timer = {'timeStart': formatTimer}
-    const rr = users.map(f=>f.workFlag)
+    const rr = users.map(f=>f.workFlag.toString())
 
     if(rr == 0) {
       setButn(true)
-      Alert.alert('Приступая к задачи', 'Работа началась, шевелись Плотва!', [{text: 'Ok'}])
+      Alert.alert('Приступая к задачи', 'Работа началась', [{text: 'Ok'}])
       const workFlag = '1'
       dispatch(updateUser(id, workFlag, location, timer))
     } else {
       setButn(false)
-      Alert.alert('Stop', 'Bu pp', [{text: 'Ok'}])
+      Alert.alert('Закончили', 'Спасибо', [{text: 'Ok'}])
       const workFlag = '0'
       const timer = {'timeStop': formatTimer}
       dispatch(updateUser(id, workFlag, location, timer))
     }
   },[])
-  const isLoad = users.map(f=>f.rol);
-  console.log(isLoad)
-  if(isLoad !== 'администратор'){
-    return (
-        <Block style={{
-          flex: 1,
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-        }} >
-          <Block flex={0.6} >
-            <ImageBackground
-                source={Images.ProfileBackground}
-                style={styles.profileContainer}
-                imageStyle={styles.profileBackground}
-            >
-              <Block flex>
-                <Block style={{
-                  position: 'absolute',
-                  width: width,
-                  zIndex: 5,
-                  paddingHorizontal: 20 }}>
-                  <Block style={{ top: height * 0.1 }}>
-                    <Block middle >
-                      <Text
-                          style={{
-                            fontFamily: 'montserrat-bold',
-                            marginBottom: theme.SIZES.BASE / 2,
-                            fontWeight: '900',
-                            fontSize: 26
-                          }}
-                          color='#ffffff'
-                      >
-                        {users.map(i=>i.name)}
-                      </Text>
-
-                      <Text
-                          size={16}
-                          color="white"
-                          style={{
-                            marginTop: 5,
-                            fontFamily: 'montserrat-bold',
-                            lineHeight: 20,
-                            fontWeight: 'bold',
-                            fontSize: 18,
-                            opacity: .8
-                          }}
-                      >
-                        {users.map(r=>r.rol)}
-                      </Text>
-                    </Block>
-                  </Block>
-                </Block>
-                <Block
-                    middle
-                    style={{ position: 'absolute', width: width, top: height * 0.3 - 22, zIndex: 99 }}
-                >
-                  <Button style={{
-                    width: 114,
-                    height: 44,
-                    marginHorizontal: 5,
-                    elevation: 0 }}
-                          textStyle={{ fontSize: 16 }} round
-                          onPress={workUpdater}
-                  >
-                    {butn ? 'Не працюю' : 'Працюю' }
-                  </Button>
-                  {butn ?
-                      <Text p style={{backgroundColor: theme.COLORS.SUCCESS, color: theme.COLORS.WHITE}}>Використовуються Ваша геолокація,
-                        щоб вимкнути натисніть “Не працюю”</Text> : null}
-                </Block>
-              </Block>
-            </ImageBackground>
-          </Block>
-          <Block />
-          <Block flex={1} style={{ padding: theme.SIZES.BASE, marginTop: 50}}>
-            <Block flex style={{ marginTop: 10 }}>
-              <Block row style={{ paddingVertical: 14, paddingHorizontal: 15 }}>
-                <Text bold size={17} color="#2c2c2c">
-                  Статус:
-                </Text>
-                <Text size={17}>{butn ? 'В работе' : 'Не працюю' }</Text>
-              </Block>
-            </Block>
-          </Block>
-        </Block>
-    )
-  } else {
-
+  const isLoad = users.map(f=>f.rol.toString());
+  const [lod, setLoad] = useState(false)
     return (
         <Block style={{
           flex: 1,
@@ -316,7 +230,6 @@ const Profile = ({navigation}) => {
         </Block>
 
     )
-  }
 }
 const styles = StyleSheet.create({
 

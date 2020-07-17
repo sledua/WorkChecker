@@ -1,13 +1,9 @@
-import React, {useState, useEffect, useCallback} from "react";
-import {
-    StyleSheet,
-    Dimensions, Alert
-} from "react-native";
-import { Block, Text, Input, Button, theme} from "galio-framework";
+import React, {useEffect, useState} from "react";
+import {Alert, Dimensions, StyleSheet} from "react-native";
+import {Block, Button, Input, Text, theme} from "galio-framework";
 import {useDispatch, useSelector} from "react-redux";
 import {addUser} from "../store/actions/worker";
 import {formatTimer} from "../model/timerDate";
-import Icon from "../components/Icon";
 import {nowTheme} from "../constants";
 import ModalDropdown from "react-native-modal-dropdown";
 
@@ -24,7 +20,7 @@ const Add = ({navigation}) =>  {
     //console.log('users',users_value);
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
-    const [valueInBase, setValueInBase] = useState();
+    const [valueInBase, setValueInBase] = useState([]);
     const [value, setValue] = useState('');
     const getAllPlace = async () => {
         const response = await fetch('https://work-checker-b96e4.firebaseio.com/users_area.json',
@@ -35,13 +31,13 @@ const Add = ({navigation}) =>  {
         const data = await response.json();
         const allTitle = Object.keys(data).map(key => ({...data[key].users_area}))
         const onlyTitle = allTitle.map(p=>p.title);
-        const r = onlyTitle;
-        console.log(valueInBase, r);
-        setValueInBase(r)
+
+        setValueInBase(onlyTitle)
+        console.log(valueInBase, onlyTitle);
     }
 
     useEffect( ()=>{
-        getAllPlace();
+        getAllPlace().then(r => r);
     },[])
     const handleOnSelect = (index, value) => {
         setValue(valueInBase[index])
@@ -64,7 +60,7 @@ const Add = ({navigation}) =>  {
 
     return (
         <Block style={styles.profileBackground} >
-            <Block  style={{ paddingHorizontal: 20, paddingTop: 100}}>
+            <Block  style={{ paddingHorizontal: 20, paddingTop: 100, position: 'absolute'}}>
 
                     <Text color={theme.COLORS.WHITE} size={18} bold>ФИО сотрудника</Text>
                     <Input
@@ -93,7 +89,7 @@ const Add = ({navigation}) =>  {
                     </ModalDropdown>
 
             </Block>
-            <Block style={{paddingHorizontal: 20, paddingVertical:15}}>
+            <Block style={{paddingHorizontal: 20, paddingVertical:15, position: 'absolute', bottom:0, }}>
                 <Button
                     shadowless
                     style={{
@@ -119,7 +115,6 @@ const styles = StyleSheet.create({
       zIndex: -1
   },
     qty: {
-      height: 40,
         width: width * 0.9,
         backgroundColor: nowTheme.COLORS.WHITE,
         paddingHorizontal: 16,

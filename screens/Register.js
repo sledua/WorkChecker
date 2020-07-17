@@ -76,7 +76,8 @@ const Register = ({navigation}) => {
     //     .then((result) => {
     //       console.log(result);
     //     });
-    // await dispatch(loginUser(verificationId))
+    // await dispatch(loginUser(verificationId)
+    await dispatch(runForUsers(inputPhone))
     await navigation.navigate("App")
   };
   return (
