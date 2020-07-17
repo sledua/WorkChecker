@@ -180,8 +180,8 @@ const Profile = ({navigation}) => {
             marginHorizontal: 5,
             marginVertical: 10,
             elevation: 0 }}
-                  textStyle={{ fontSize: 16 }}
-                  round
+            textStyle={{ fontSize: 16 }}
+            onPress={() => navigation.navigate('AddArea')}
                   >
             Добавить рабочую область
           </Button>
@@ -196,7 +196,6 @@ const Profile = ({navigation}) => {
               marginHorizontal: 5,
               elevation: 0 }}
               textStyle={{ fontSize: 16 }}
-              round
               onPress={() => navigation.navigate('Add')}>
               Добавить сотрудника
             </Button>

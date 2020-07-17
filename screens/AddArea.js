@@ -1,21 +1,22 @@
 import React, {useState, useEffect, useCallback} from "react";
-import {
-    StyleSheet,
-    Dimensions
-} from "react-native";
+import {StyleSheet, Dimensions, ActivityIndicator, Alert} from "react-native";
 import {Block, Text, Input, Button, theme} from "galio-framework";
 import {useDispatch} from "react-redux";
 import {addUser} from "../store/actions/worker";
 import {formatTimer} from "../model/timerDate";
+import MapPreview from "../components/MapPreview";
+import * as Location from "expo-location";
 
 const { width, height } = Dimensions.get('screen');
 
-const AddArea = () =>  {
+const AddArea = ({navigation, route}) =>  {
+
     //const dispatch = useDispatch();
     const [workTitle, setWorkTitle] = useState('');
     const [descriptions, setDescriptions] = useState('');
     const [workPlace, setWorkPlace] = useState('');
-
+    const [isFetching, setIsFetching] = useState(false);
+    const [pickLocation, setPickLocation] = useState();
     const submitHandler = () => {
         const users_area = {
             title: workTitle,
@@ -25,31 +26,75 @@ const AddArea = () =>  {
         }
         //dispatch(addUser(users_area))
     };
+
+    const userPikedLocation = route.params ? route.params.pickedLocation : null;
+    console.log('addArea', userPikedLocation)
+    useEffect(() => {
+
+        if(userPikedLocation) {
+            setPickLocation(userPikedLocation);
+        }
+    },[])
+    const getLocation = async () => {
+        try {
+            setIsFetching(true)
+            const loc = await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.High})
+            setPickLocation(
+                {
+                    lat: loc.coords.latitude,
+                    lgn: loc.coords.longitude
+                }
+            )
+        } catch (e) {
+            console.log(e);
+            Alert.alert('Нет подключение', 'Повторите попытку через минуту, и повторите подключение к сети', [{text: 'Добре'}])
+        }
+        setIsFetching(false);
+    }
+    const getLocationOnMap = () => {
+        navigation.navigate('MapScreen');
+    }
     return (
         <Block style={styles.profileBackground} >
             <Block style={{ paddingHorizontal: 20,position: 'absolute', top: width * 0.3, width: width}}>
-                <Text>название</Text>
+                <Text color={theme.COLORS.WHITE} size={18} bold>Название</Text>
                 <Input
-                    rounded
-                    placeholder='Введите ФИО'
+                    placeholder='название'
                     placeholderTextColor="#4F8EC9"
+                    color={theme.COLORS.BLACK}
                     onChangeText={setWorkTitle}/>
-                <Text>краткое описание</Text>
+                <Text color={theme.COLORS.WHITE} size={18} bold>Краткое описание</Text>
                 <Input
-                    rounded
-                    placeholder='+380934666049'
-                    type="number-pad"
+                    placeholder='краткое описание'
                     placeholderTextColor="#4F8EC9"
                     onChangeText={setDescriptions}/>
-                <Text>координаты</Text>
-                <Input
-                    rounded
-                    placeholder='+380934666049'
-                    type="number-pad"
-                    placeholderTextColor="#4F8EC9"
-                    onChangeText={workPlace}/>
+                <Text color={theme.COLORS.WHITE} size={18} bold>Координаты</Text>
+                <Block>
+                    <MapPreview style={styles.mapPreview} location={pickLocation}>
+                    {isFetching ? (
+                        <ActivityIndicator size="large" color={theme.COLORS.PRIMARY}/>
+                        ) : (
+                        <Text>Есть вопросы</Text>
+                    )}
+                    </MapPreview>
+
+                    <Button
+                        style={{marginTop: 10, width: '100%'}}
+                        color={theme.COLORS.GREY}
+                        onPress={getLocation}
+                    >
+                        <Text color={theme.COLORS.WHITE} bold>Мои координаты</Text>
+                    </Button>
+                    <Button
+                        style={{marginTop: 10, width: '100%'}}
+                        color={theme.COLORS.GREY}
+                        onPress={getLocationOnMap}
+                    >
+                        <Text color={theme.COLORS.WHITE} bold>Указать точку на карте</Text>
+                    </Button>
+                </Block>
                 <Button
-                    color="#50C7C7"
+                    style={{marginTop: height * 0.28, width: '100%'}}
                     shadowless
                     onPress={submitHandler}
                     disabled={!setWorkTitle && !setDescriptions && workPlace}>
@@ -65,7 +110,14 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'space-between',
-        backgroundColor: theme.COLORS.FACEBOOK
+        backgroundColor: theme.COLORS.FACEBOOK,
+        zIndex: -1
     },
+    mapPreview: {
+        width: '100%',
+        height: 150,
+        borderColor: theme.COLORS.GREY,
+        borderWidth: 1
+    }
 });
 export default AddArea;

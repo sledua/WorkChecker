@@ -43,7 +43,7 @@ const BasketButton = ({ isWhite, style, navigation }) => (
 class Header extends React.Component {
   handleLeftPress = () => {
     const { back, navigation } = this.props;
-    return back ? navigation.openDrawer() : navigation.openDrawer();
+    return back ? navigation.goBack() : navigation.openDrawer();
   };
   renderRight = () => {
     const { white, title, navigation } = this.props;
@@ -216,7 +216,7 @@ class Header extends React.Component {
           rightStyle={{ alignItems: 'center' }}
           left={
             <Icon
-              name={back ? 'menu' : 'menu'}
+              name={back ? 'arrow-left2' : 'menu'}
               family="NowExtra"
               size={16}
               onPress={this.handleLeftPress}

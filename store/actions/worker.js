@@ -1,7 +1,14 @@
 export const CREATE_USER = 'CREATE_PRODUCT';
 export const UPDATE_USER = 'UPDATE_USER';
-export const UPDATE_STATUS = 'UPDATE_STATUS';
 export const RUN_FOR_USERS = 'RUN_FOR_USERS';
+export const LOGIN = 'LOGIN';
+
+export const loginUser = verificationId => async dispatch => {
+    dispatch({
+        type: LOGIN,
+        token: verificationId
+    })
+}
 
 export const runForUsers = inputPhone => async  dispatch => {
     const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',

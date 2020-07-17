@@ -1,6 +1,5 @@
 import React from 'react';
-import { Block } from "galio-framework";
-import { Easing, Animated, Dimensions } from "react-native";
+import { Dimensions } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 // screens
@@ -8,8 +7,8 @@ import About from '../screens/About';
 import Add from '../screens/Add';
 import Profile from '../screens/Profile';
 import Register from '../screens/Register';
-import Components from '../screens/Components';
-import Articles from '../screens/Articles';
+import AddArea from "../screens/AddArea";
+import MapScreen from "../screens/MapScreen";
 import Onboarding from '../screens/Onboarding';
 // drawer
 import CustomDrawerContent from "./Menu";
@@ -76,7 +75,7 @@ function AddStack(props) {
                 options={{
                     header: ({ navigation, scene }) => (
                         <Header
-                            title="Add user"
+                            title="Добавление сотрудника"
                             back
                             white
                             transparent
@@ -90,6 +89,53 @@ function AddStack(props) {
         </Stack.Navigator>
     );
 }
+function AddAreaStack(props) {
+    return(
+        <Stack.Navigator initialRouteName="AddArea" mode="card" headerMode="screen">
+            <Stack.Screen
+                name="AddArea"
+                component={AddArea}
+                options={{
+                    header: ({ navigation, scene }) => (
+                        <Header
+                            title="Добавление рабочей области"
+                            back
+                            white
+                            transparent
+                            navigation={navigation}
+                            scene={scene}
+                        />
+                    ),
+                    headerTransparent: true,
+                }}
+            />
+            <Stack.Screen
+                name="MapScreen"
+                component={MapScreen}
+                options={{
+                    header: ({ navigation, scene }) => (
+                        <Header
+                            title="Добавление рабочей области на карте"
+                            back
+                            white
+                            transparent
+                            navigation={navigation}
+                            scene={scene}
+                        />
+                    ),
+                    headerTransparent: true,
+                }}
+            />
+        </Stack.Navigator>
+    );
+}
+// function MapScreenStack(props) {
+//     return(
+//         <Stack.Navigator initialRouteName="MapScreen" mode="card" headerMode="screen">
+//
+//         </Stack.Navigator>
+//     );
+// }
 function ProfileStack(props) {
   return (
     <Stack.Navigator initialRouteName="Profile" mode="card" headerMode="screen">
@@ -149,6 +195,7 @@ function AppStack(props) {
       <Drawer.Screen name="Profile" component={ProfileStack} />
       <Drawer.Screen name="About" component={AboutStack} />
       <Drawer.Screen name="Add" component={AddStack} />
+      <Drawer.Screen name="AddArea" component={AddAreaStack} />
     </Drawer.Navigator>
   );
 }

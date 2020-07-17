@@ -1,14 +1,18 @@
-import {UPDATE_STATUS, CREATE_USER, UPDATE_USER, RUN_FOR_USERS} from "../actions/worker";
+import {CREATE_USER, UPDATE_USER, RUN_FOR_USERS, LOGIN} from "../actions/worker";
 
 const initialState = {
     usersAdmin: [],
     usersWorker: [],
-
+    token: null,
 };
 
 
 export const workerReducer = (state = initialState, action) => {
     switch (action.type) {
+        case LOGIN:
+            return{
+                token: action.token
+            }
         case RUN_FOR_USERS:
             return {
                 ...state,

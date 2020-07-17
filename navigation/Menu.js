@@ -2,9 +2,7 @@ import React from "react";
 import {
   ScrollView,
   StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  Linking
+  Dimensions
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 import { useSafeArea } from "react-native-safe-area-context";

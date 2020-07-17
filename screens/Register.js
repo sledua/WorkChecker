@@ -9,8 +9,8 @@ import {
 import { Block, Checkbox, Text, theme } from 'galio-framework';
 import { Button, Icon, Input } from '../components';
 import { Images, nowTheme } from '../constants';
-import {useDispatch} from "react-redux";
-import {runForUsers} from "../store/actions/worker";
+import {useDispatch, useSelector} from "react-redux";
+import {loginUser, runForUsers} from "../store/actions/worker";
 import firebase from "../firebase";
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 import * as Permissions from 'expo-permissions';
@@ -25,13 +25,15 @@ const DismissKeyboard = ({ children }) => (
 const Register = ({navigation}) => {
 
   const dispatch = useDispatch();
+  const tokens = useSelector(state => state.worker.usersAdmin);
   const [inputPhone, setInputPhone] = useState('+')
   const [code, setCode] = useState('');
   const [verificationId, setVerificationId] = useState(null);
   const recaptchaVerifier = useRef(null);
 
   console.log(verificationId)
-
+  const userToken = tokens.toString();
+  console.log('userToken',userToken);
   const registerForPushNotifications = async () => {
     const {status} = await Permissions.getAsync(Permissions.NOTIFICATIONS);
     let finalStatus = status;
@@ -69,19 +71,19 @@ const Register = ({navigation}) => {
           .then(setVerificationId);
     }
     await dispatch(runForUsers(inputPhone))
-    //
   }
   const confirmCode = async () => {
-    const credential = await firebase.auth.PhoneAuthProvider.credential(
-        verificationId,
-        code
-    );
-    await firebase
-        .auth()
-        .signInWithCredential(credential)
-        .then((result) => {
-          console.log(result);
-        });
+    // const credential = await firebase.auth.PhoneAuthProvider.credential(
+    //     verificationId,
+    //     code
+    // );
+    // await firebase
+    //     .auth()
+    //     .signInWithCredential(credential)
+    //     .then((result) => {
+    //       console.log(result);
+    //     });
+    // await dispatch(loginUser(verificationId))
     await navigation.navigate("App")
   };
   return (
@@ -283,7 +285,7 @@ const styles = StyleSheet.create({
   createButton: {
     width: width * 0.5,
     marginTop: 25,
-    marginBottom: 40
+    marginBottom: 5
   },
   social: {
     width: theme.SIZES.BASE * 3.5,

@@ -5,7 +5,7 @@ import {
 } from "react-native";
 import { Block, Text, Input, Button, theme} from "galio-framework";
 import Select from "../components/Select";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {addUser} from "../store/actions/worker";
 import {formatTimer} from "../model/timerDate";
 import Icon from "../components/Icon";
@@ -16,17 +16,19 @@ const { width, height } = Dimensions.get('screen');
 
 const Add = () =>  {
     const dispatch = useDispatch();
+    const users = useSelector(state => state.worker.usersAdmin);
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [valueInBase, setValueInBase] = useState(['1Уборка в саду', '2Уборка в саду', '3Уборка в саду', '4Уборка в саду', '5Уборка в саду'])
     const [value, setValue] = useState('');
-
+    const adminPhone = users.map(phone => phone.phone);
     console.log(value);
     const handleOnSelect = (index, value) => {
         setValue(valueInBase[index])
     }
     const submitHandler = () => {
         const user = {
+            phoneAdmin: adminPhone,
             name: name,
             phone: phone,
             select: value,
@@ -66,13 +68,13 @@ const Add = () =>  {
                         </Text>
                     </Block>
                 </ModalDropdown>
-                <Button
-                    shadowless
-                    style={{marginTop: height * 0.48, color: theme.COLORS.PRIMARY}}
-                    onPress={submitHandler}
-                    disabled={!name && !phone}>
-                    Добавить пользователя
-                </Button>
+                    <Button
+                        shadowless
+                        style={{marginTop: height * 0.48}}
+                        onPress={submitHandler}
+                        disabled={!name && !phone && !value}>
+                        Добавить пользователя
+                    </Button>
             </Block>
 
         </Block>
@@ -89,7 +91,7 @@ const styles = StyleSheet.create({
   },
     qty: {
         width: width * 0.9,
-        backgroundColor: nowTheme.COLORS.DEFAULT,
+        backgroundColor: nowTheme.COLORS.WHITE,
         paddingHorizontal: 16,
         marginVertical: 10,
         paddingTop: 10,
@@ -101,7 +103,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 1
     },
     text: {
-        color: nowTheme.COLORS.WHITE,
+        color: "#4F8EC9",
         fontWeight: '600'
     },
     dropdown: {
