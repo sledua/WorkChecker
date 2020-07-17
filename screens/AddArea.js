@@ -10,8 +10,10 @@ import * as Location from "expo-location";
 const { width, height } = Dimensions.get('screen');
 
 const AddArea = ({navigation, route}) =>  {
+    const dispatch = useDispatch();
     const users = useSelector(state => state.worker.usersAdmin);
-    //const dispatch = useDispatch();
+
+
     const [workTitle, setWorkTitle] = useState('');
     const [descriptions, setDescriptions] = useState('');
     const [workPlace, setWorkPlace] = useState('');
@@ -19,8 +21,7 @@ const AddArea = ({navigation, route}) =>  {
     const [pickLocation, setPickLocation] = useState();
     const [isShow, setShow] = useState(false)
     const adminPhone = users.map(phone => phone.phone);
-    const submitHandler = async () => {
-        setShow(true)
+    const submitHandler = async (title, message) => {
         const users_area = {
             phoneAdmin: adminPhone,
             title: workTitle,
@@ -28,13 +29,12 @@ const AddArea = ({navigation, route}) =>  {
             place: pickLocation,
             timeAdd: formatTimer
         }
-        await dispatch(addPlace(users_area))
-        setShow(false)
-        await navigation.navigate('Profile')
+        dispatch(addPlace(users_area))
+        Alert.alert('Задача добавлена', `Задача ${workTitle} добавлена`, [{text: 'Ок'}])
     };
 
     const userPikedLocation = route.params ? route.params.pickedLocation : null;
-    console.log('addArea', userPikedLocation)
+    console.log('addArea', pickLocation)
     useEffect(() => {
 
         if(userPikedLocation) {
@@ -62,7 +62,7 @@ const AddArea = ({navigation, route}) =>  {
     }
     return (
         <Block style={styles.profileBackground} >
-            <Block style={{ paddingHorizontal: 20,position: 'absolute', top: width * 0.3, width: width}}>
+            <Block style={{ paddingHorizontal: 20, paddingTop: 100 }}>
                 <Text color={theme.COLORS.WHITE} size={18} bold>Название</Text>
                 <Input
                     placeholder='название'
@@ -73,6 +73,7 @@ const AddArea = ({navigation, route}) =>  {
                 <Input
                     placeholder='краткое описание'
                     placeholderTextColor="#4F8EC9"
+                    color={theme.COLORS.BLACK}
                     onChangeText={setDescriptions}/>
                 <Text color={theme.COLORS.WHITE} size={18} bold>Координаты</Text>
                 <Block>
@@ -83,30 +84,36 @@ const AddArea = ({navigation, route}) =>  {
                         <Text>Есть вопросы</Text>
                     )}
                     </MapPreview>
-
+                </Block>
+                <Block row>
                     <Button
-                        style={{marginTop: 10, width: '100%'}}
+                        style={{marginTop: 10, width: '48%', marginHorizontal: 2}}
+                        size="small"
                         color={theme.COLORS.GREY}
                         onPress={getLocation}
                     >
                         <Text color={theme.COLORS.WHITE} bold>Мои координаты</Text>
                     </Button>
                     <Button
-                        style={{marginTop: 10, width: '100%'}}
+                        style={{marginTop: 10, width: '48%', marginHorizontal: 10}}
+                        size="small"
                         color={theme.COLORS.GREY}
                         onPress={getLocationOnMap}
                     >
                         <Text color={theme.COLORS.WHITE} bold>Указать точку на карте</Text>
                     </Button>
                 </Block>
+
+
+            </Block>
+            <Block style={{paddingHorizontal: 20, paddingVertical:15}}>
                 <Button
-                    style={{marginTop: height * 0.28, width: '100%'}}
+                    style={{marginTop: 2, width: '100%'}}
                     shadowless
                     onPress={submitHandler}
                     disabled={!setWorkTitle && !setDescriptions && workPlace}>
                     Добавить</Button>
             </Block>
-            <Toast isShow={isShow} positionIndicator="center" color="success">Новый сотрудник добавлен</Toast>
         </Block>
     );
 }
@@ -122,6 +129,7 @@ const styles = StyleSheet.create({
     mapPreview: {
         width: '100%',
         height: 150,
+        marginTop: 10,
         borderColor: theme.COLORS.GREY,
         borderWidth: 1
     }

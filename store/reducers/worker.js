@@ -1,13 +1,10 @@
-import {CREATE_USER, UPDATE_USER, RUN_FOR_USERS, LOGIN, ADD_PLACE} from "../actions/worker";
+import {CREATE_USER, UPDATE_USER, RUN_FOR_USERS, LOGIN} from "../actions/worker";
 
 const initialState = {
     usersAdmin: [],
     usersWorker: [],
-    usersArea: [],
     token: null,
 };
-
-
 export const workerReducer = (state = initialState, action) => {
     switch (action.type) {
         case LOGIN:
@@ -35,11 +32,6 @@ export const workerReducer = (state = initialState, action) => {
             return {
                 ...state,
                 usersAdmin: [...state.usersAdmin,{...state.payload}]
-            }
-        case ADD_PLACE:
-            return {
-                ...state,
-                usersArea: [...state.usersArea,{...state.payload}]
             }
         default:
             return state;

@@ -30,42 +30,32 @@ const Register = ({navigation}) => {
   const [code, setCode] = useState('');
   const [verificationId, setVerificationId] = useState(null);
   const recaptchaVerifier = useRef(null);
-
   const userToken = tokens;
-  console.log('userToken',userToken);
-  const registerForPushNotifications = async () => {
-    const {status} = await Permissions.getAsync(Permissions.NOTIFICATIONS);
-    let finalStatus = status;
 
-    if(status !== 'granted') {
-      const {status} = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-      finalStatus = status;
-    }
-    if(finalStatus !== 'granted'){return; }
+  const getAllPhone = async () => {
+  const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
+      {
+        method: 'GET',
+        headers: {'Context-Type': 'application/json'}
+      })
+  const data = await response.json();
+  const allUsers = Object.keys(data).map(key => ({...data[key].user}))
+  // const rt = allUsers.map(p=>p.phone)
+  // setOnlyPhone(rt.filter(p => p === inputPhone));
+  // console.log(rt, inputPhone, onlyPhone);
+}
 
-    let token = await Notifications.getExpoPushTokenAsync();
-    console.log(token);
-  }
-  // useEffect(() => {
-  //   registerForPushNotifications()
-  // },[registerForPushNotifications])
+  useEffect( ()=>{
+    getAllPhone();
+  },[])
+
   const authInApp = async () => {
 
-    const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
-        {
-          method: 'GET',
-          headers: {'Context-Type': 'application/json'}
-        })
-    const data = await response.json();
-    const allUsers = Object.keys(data).map(key => ({...data[key].user}))
-    const onlyPhone = allUsers.map(p=>p.phone);
-    const r = onlyPhone.toString();
-    console.log(onlyPhone, r);
-    if(inputPhone !== r) {
-        Alert.alert('Ops','No phone in data base')
+    if(!inputPhone) {
+        Alert.alert('Ошибка','Учетной записи нет, обратитесь к администратору', [{text: 'Добре'}])
     } else {
-      Alert.alert('Ok','Await sms')
-      const phoneProvider = new firebase.auth.PhoneAuthProvider();
+      Alert.alert('Инфо','Ожидайте смс для входа')
+      const phoneProvider = await new firebase.auth.PhoneAuthProvider();
       phoneProvider
           .verifyPhoneNumber(inputPhone, recaptchaVerifier.current)
           .then(setVerificationId);
@@ -73,6 +63,9 @@ const Register = ({navigation}) => {
     await dispatch(runForUsers(inputPhone))
   }
   const confirmCode = async () => {
+    // if(!verificationId){
+    //   Alert.alert('Ошибка','Сесия устарела, повторите отправке смс', [{text: 'Добре'}])
+    // }
     // const credential = await firebase.auth.PhoneAuthProvider.credential(
     //     verificationId,
     //     code
@@ -83,8 +76,7 @@ const Register = ({navigation}) => {
     //     .then((result) => {
     //       console.log(result);
     //     });
-    //await dispatch(loginUser(verificationId))
-    await dispatch(runForUsers(inputPhone))
+    // await dispatch(loginUser(verificationId))
     await navigation.navigate("App")
   };
   return (

@@ -25,7 +25,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.gmail.work-checker-work-remotely",
-      "buildNumber": "0.0.2"
+      "buildNumber": "0.0.3"
     },
     "packagerOpts": {
       "assetExts": [
@@ -34,7 +34,7 @@
     },
     "android": {
       "package": "com.gmail.work_checker_work_remotely",
-      "versionCode": 2,
+      "versionCode": 3,
       "permissions": ["ACCESS_FINE_LOCATION","ACCESS_COARSE_LOCATION"],
       "config": {
         "googleMaps": {
@@ -42,7 +42,6 @@
         }
       }
     },
-
     "extra": {
       "firebase" : {
         "apiKey": "AIzaSyAc2265y__KIgMYtFeosl_KvDTeP92SmkY",

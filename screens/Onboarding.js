@@ -21,13 +21,13 @@ export default class Onboarding extends React.Component {
           <Block center style={styles.padded}>
             <Block>
               <Block middle>
-                <Text style={{ fontFamily: 'montserrat-bold',fontSize: 80,color: theme.COLORS.WHITE,bottom: 450, position: 'absolute' }}>W</Text>
+                <Text style={{ fontFamily: 'montserrat-bold',fontSize: 80,color: theme.COLORS.WHITE,bottom: 400, position: 'absolute' }}>W</Text>
               </Block>
               <Block>
                 <Block middle>
                   <Text
                     style={{
-                      fontFamily: 'montserrat-regular', bottom: 250, position: 'absolute', letterSpacing: 1, paddingHorizontal: 10, textAlign: 'center'
+                      fontFamily: 'montserrat-regular', bottom: 200, position: 'absolute', letterSpacing: 1, paddingHorizontal: 10, textAlign: 'center'
                     }}
                     color="white"
                     size={42}

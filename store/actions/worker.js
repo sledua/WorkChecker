@@ -54,7 +54,7 @@ export const addPlace = users_area => async  dispatch => {
         })
     const data = await response.json();
     const payload = {...users_area, id: data.name};
-    await fetch(`https://work-checker-b96e4.firebaseio.com/users_area/${data.name}/user.json`,
+    await fetch(`https://work-checker-b96e4.firebaseio.com/users_area/${data.name}/users_area.json`,
         {method: 'PATCH',
             headers: {'Context-Type': 'application/json'},
             body: JSON.stringify({id: data.name})

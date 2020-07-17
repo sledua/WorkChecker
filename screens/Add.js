@@ -1,9 +1,9 @@
 import React, {useState, useEffect, useCallback} from "react";
 import {
-  StyleSheet,
-    Dimensions
+    StyleSheet,
+    Dimensions, Alert
 } from "react-native";
-import { Block, Text, Input, Button, theme, Toast} from "galio-framework";
+import { Block, Text, Input, Button, theme} from "galio-framework";
 import {useDispatch, useSelector} from "react-redux";
 import {addUser} from "../store/actions/worker";
 import {formatTimer} from "../model/timerDate";
@@ -15,24 +15,38 @@ const { width, height } = Dimensions.get('screen');
 
 const Add = ({navigation}) =>  {
     const dispatch = useDispatch();
+    const users_area = useSelector(state => state.placer.usersArea);
     const users = useSelector(state => state.worker.usersAdmin);
-    const users_area = useSelector(state => state.worker.usersArea);
+
+
     const adminPhone = users.map(phone => phone.phone);
-    const users_value = users_area.map(value => value.title);
+    //const users_value = users_area.map(value => value.title);
+    //console.log('users',users_value);
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
-    const [valueInBase, setValueInBase] = useState(['1Уборка в саду', '2Уборка в саду', '3Уборка в саду', '4Уборка в саду', '5Уборка в саду'])
+    const [valueInBase, setValueInBase] = useState();
     const [value, setValue] = useState('');
-    const [isShow, setShow] = useState(false)
-    useEffect(()=>{
-        setValueInBase(users_value)
+    const getAllPlace = async () => {
+        const response = await fetch('https://work-checker-b96e4.firebaseio.com/users_area.json',
+            {
+                method: 'GET',
+                headers: {'Context-Type': 'application/json'}
+            })
+        const data = await response.json();
+        const allTitle = Object.keys(data).map(key => ({...data[key].users_area}))
+        const onlyTitle = allTitle.map(p=>p.title);
+        const r = onlyTitle;
+        console.log(valueInBase, r);
+        setValueInBase(r)
+    }
+
+    useEffect( ()=>{
+        getAllPlace();
     },[])
-    console.log(value);
     const handleOnSelect = (index, value) => {
         setValue(valueInBase[index])
     }
     const submitHandler = async () => {
-        setShow(true)
         const user = {
             phoneAdmin: adminPhone,
             name: name,
@@ -43,49 +57,55 @@ const Add = ({navigation}) =>  {
             workFlag: '0',
             timeAdd: formatTimer
         }
-      await dispatch(addUser(user))
-        await setShow(false)
-        await navigation.navigate('Profile')
+       dispatch(addUser(user))
+        Alert.alert('Сотрудник добавлен', `Сотрудник ${name} добавлен(а), на задание ${value}`, [{text: 'Ок'}])
     };
+
+
     return (
         <Block style={styles.profileBackground} >
-            <Block style={{ paddingHorizontal: 20,position: 'absolute', top: width * 0.3, width: width}}>
-                <Text color={theme.COLORS.WHITE} size={18} bold>ФИО сотрудника</Text>
-                <Input
-                  placeholder='Введите ФИО'
-                  placeholderTextColor="#4F8EC9"
-                  color={theme.COLORS.BLACK}
-                  onChangeText={setName}/>
-                <Text color={theme.COLORS.WHITE} size={18} bold>Телефон сотрудника</Text>
-                <Input
-                  placeholder='+380934666049'
-                  placeholderTextColor="#4F8EC9"
-                  color={theme.COLORS.BLACK}
-                  onChangeText={setPhone}/>
-                <Text color={theme.COLORS.WHITE} size={18} bold>Рабочая область</Text>
-                <ModalDropdown
-                    style={styles.qty}
-                    onSelect={handleOnSelect}
-                    options={valueInBase}
-                    dropdownStyle={styles.dropdown}
-                    dropdownTextStyle={{ paddingLeft: 16, fontSize: 12 }}>
-                    <Block flex row middle space="between">
-                        <Text size={12} style={styles.text}>
-                            {value}
-                        </Text>
-                    </Block>
-                </ModalDropdown>
-                <Toast isShow={isShow} positionIndicator="center" color="success">Новый сотрудник добавлен</Toast>
-                    <Button
-                        shadowless
-                        style={{marginTop: height * 0.48}}
-                        onPress={submitHandler}
-                        disabled={!name && !phone && !value}
-                        >
-                        Добавить пользователя
-                    </Button>
-            </Block>
+            <Block  style={{ paddingHorizontal: 20, paddingTop: 100}}>
 
+                    <Text color={theme.COLORS.WHITE} size={18} bold>ФИО сотрудника</Text>
+                    <Input
+                      placeholder='Введите ФИО'
+                      placeholderTextColor="#4F8EC9"
+                      color={theme.COLORS.BLACK}
+                      onChangeText={setName}/>
+                    <Text color={theme.COLORS.WHITE} size={18} bold>Телефон сотрудника</Text>
+                    <Input
+                      placeholder='+380934666049'
+                      placeholderTextColor="#4F8EC9"
+                      color={theme.COLORS.BLACK}
+                      onChangeText={setPhone}/>
+                    <Text color={theme.COLORS.WHITE} size={18} bold>Рабочая область</Text>
+                    <ModalDropdown
+                        style={styles.qty}
+                        onSelect={handleOnSelect}
+                        options={valueInBase}
+                        dropdownStyle={styles.dropdown}
+                        dropdownTextStyle={{ paddingLeft: 16, fontSize: 14 }}>
+                        <Block flex row middle space="between">
+                            <Text size={14} style={styles.text}>
+                                {value}
+                            </Text>
+                        </Block>
+                    </ModalDropdown>
+
+            </Block>
+            <Block style={{paddingHorizontal: 20, paddingVertical:15}}>
+                <Button
+                    shadowless
+                    style={{
+                        height: 44,
+                        elevation: 0 }}
+                    textStyle={{ fontSize: 16 }}
+                    onPress={submitHandler}
+                    disabled={!name && !phone}
+                    >
+                    Добавить пользователя
+                </Button>
+            </Block>
         </Block>
     );
 }
@@ -99,6 +119,7 @@ const styles = StyleSheet.create({
       zIndex: -1
   },
     qty: {
+      height: 40,
         width: width * 0.9,
         backgroundColor: nowTheme.COLORS.WHITE,
         paddingHorizontal: 16,

@@ -6,8 +6,8 @@ import {Block, Button, Text, theme} from "galio-framework";
 const MapScreen = ({navigation}) => {
     const [selectedLocation, setSelectedLocation] = useState();
     const mapRegion = {
-        latitude: 37.78,
-        longitude: -122.43,
+        latitude: 49.9934983,
+        longitude: 36.2303817,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
     }
