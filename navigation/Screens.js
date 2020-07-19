@@ -47,7 +47,7 @@ function AboutStack(props) {
     return(
         <Stack.Navigator initialRouteName="About" mode="card" headerMode="screen">
             <Stack.Screen
-                name="About"
+                name="ІНФОРМАЦІЯ"
                 component={About}
                 options={{
                     header: ({ navigation, scene }) => (
@@ -117,7 +117,7 @@ function AddAreaStack(props) {
                         <Header
                             title="Добавление рабочей области на карте"
                             back
-                            white
+                            black
                             transparent
                             navigation={navigation}
                             scene={scene}
@@ -133,7 +133,7 @@ function ProfileStack(props) {
   return (
     <Stack.Navigator initialRouteName="Profile" mode="card" headerMode="screen">
       <Stack.Screen
-        name="Profile"
+        name="ПРОФІЛЬ"
         component={Profile}
         options={{
           header: ({ navigation, scene }) => (
@@ -183,10 +183,10 @@ function AppStack(props) {
           fontWeight: "normal"
         }
       }}
-      initialRouteName="Profile"
+      initialRouteName="ПРОФІЛЬ"
     >
-      <Drawer.Screen name="Profile" component={ProfileStack} />
-      <Drawer.Screen name="About" component={AboutStack} />
+      <Drawer.Screen name="ПРОФІЛЬ" component={ProfileStack} />
+      <Drawer.Screen name="ІНФОРМАЦІЯ" component={AboutStack} />
       <Drawer.Screen name="Add" component={AddStack} />
       <Drawer.Screen name="AddArea" component={AddAreaStack} />
     </Drawer.Navigator>

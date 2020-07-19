@@ -13,7 +13,7 @@ const AddArea = ({navigation, route}) =>  {
     const dispatch = useDispatch();
     const users = useSelector(state => state.worker.usersAdmin);
 
-    const userPikedLocation = route.params ? route.params.pickedLocation : null;
+
     console.log('addArea', pickLocation)
     const [workTitle, setWorkTitle] = useState('');
     const [descriptions, setDescriptions] = useState('');
@@ -23,7 +23,14 @@ const AddArea = ({navigation, route}) =>  {
     const [isShow, setShow] = useState(false)
     const adminPhone = users.map(phone => phone.phone.toString());
     const adminPhoneRev = Object.assign({},adminPhone);
-    console.log(adminPhoneRev)
+    const userPikedLocation = route.params ? route.params.pickedLocation : null;
+
+    useEffect(() => {
+        if(userPikedLocation) {
+            setPickLocation(userPikedLocation);
+        }
+    },[userPikedLocation])
+
     const submitHandler = async (title, message) => {
         const users_area = {
             phoneAdmin: adminPhoneRev["0"],
@@ -37,12 +44,7 @@ const AddArea = ({navigation, route}) =>  {
     };
 
 
-    useEffect(() => {
 
-        if(userPikedLocation) {
-            setPickLocation(userPikedLocation);
-        }
-    },[])
     const getLocation = async () => {
         try {
             setIsFetching(true)
@@ -83,7 +85,7 @@ const AddArea = ({navigation, route}) =>  {
                     {isFetching ? (
                         <ActivityIndicator size="large" color={theme.COLORS.PRIMARY}/>
                         ) : (
-                        <Text>Есть вопросы</Text>
+                        <Text>error</Text>
                     )}
                     </MapPreview>
                 </Block>

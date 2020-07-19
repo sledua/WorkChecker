@@ -70,7 +70,7 @@ const Register = ({navigation}) => {
 
   }
   const confirmCode = async () => {
-    if(verificationId){
+    if(!verificationId){
       Alert.alert('Ошибка','Сесия устарела, повторите отправке смс', [{text: 'Добре'}])
     } else {
       setIsLoading(true)
