@@ -25,7 +25,13 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.gmail.work-checker-work-remotely",
-      "buildNumber": "0.0.3"
+      "buildNumber": "0.0.3",
+      "infoPlist": {
+        "UIBackgroundModes": ["location", "fetch"]
+      },
+      "config": {
+        "googleMapsApiKey": "AIzaSyDoc50sF0s6zLxzgmFgKZmf0MSYds5NL48"
+      }
     },
     "packagerOpts": {
       "assetExts": [

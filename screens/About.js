@@ -1,37 +1,35 @@
 import React from "react";
-import {
-  ImageBackground,
-  Image,
-  StyleSheet,
-  Dimensions
-} from "react-native";
-import { Block, Button, Text, theme } from "galio-framework";
-
-const { height, width } = Dimensions.get("screen");
-
-import Images from "../constants/Images";
+import {StyleSheet} from "react-native";
+import { Block, Text, theme } from "galio-framework";
 
 class About extends React.Component {
   render() {
     return (
       <Block flex style={styles.container}>
-        <Block flex center>
-          <ImageBackground
-            source={Images.Pro}
-            style={{ height, width, zIndex: 1, opacity: 0.2 }}
-          />
-        </Block>
-
         <Block flex style={styles.padded}>
-
-          <Block style={{ marginTop: -50, marginBottom: 30}}>
+          <Block center>
             <Text
               color="white"
-              size={16}
+              bold
+              h5
               style={{ fontFamily: 'montserrat-regular' }}
             >
-              About page
+              Інформація для користувача
             </Text>
+            <Text color="white"
+                  bold h5>Інформаційний додаток Work Checker</Text>
+          </Block>
+          <Block style={{paddingHorizontal: 20}}>
+            <Text color="white"
+                  bold center style={{paddingTop: 50, paddingBottom: 5, fontFamily: 'montserrat-bold'}}>Для адміністратора</Text>
+            <Text color="white" size={16} style={{paddingTop: 10, paddingBottom: 5}}>Щоб розпочаті роботу необхідно натиснути працюю</Text>
+            <Text color="white" size={16} style={{paddingTop: 10, paddingBottom: 5}}>Для того щоб додати завдання небхідно перейти у відповідний розділ, і заповнити всі поля</Text>
+            <Text color="white" size={16} style={{paddingTop: 10}}>Для того щоб додати виконавця небхідно перейти у відповідний розділ, і заповнити всі поля</Text>
+          </Block>
+          <Block style={{paddingHorizontal: 20}}>
+            <Text color="white"
+                  bold center style={{paddingTop: 50, paddingBottom: 5, fontFamily: 'montserrat-regular'}}>Для Співробітника</Text>
+            <Text color="white" size={16} style={{paddingTop: 10, paddingBottom: 5}}>Щоб розпочаті роботу необхідно натиснути працюю</Text>
           </Block>
         </Block>
       </Block>
@@ -41,17 +39,12 @@ class About extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.COLORS.BLACK
+    backgroundColor: theme.COLORS.FACEBOOK
   },
   padded: {
-    top: 270,
-    paddingHorizontal: theme.SIZES.BASE * 2,
-    position: 'absolute',
-    bottom: theme.SIZES.BASE,
-    zIndex: 2
-  },
-  font: {
-    fontFamily: 'montserrat-bold'
+    flex: 1,
+    paddingTop: 180,
+
   }
 });
 

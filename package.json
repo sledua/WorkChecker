@@ -45,7 +45,8 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "expo-constants": "~9.0.0",
-    "react-native-maps": "0.26.1"
+    "react-native-maps": "0.26.1",
+    "expo-task-manager": "~8.1.0"
   },
   "devDependencies": {
     "@expo/vector-icons": "^10.2.0",

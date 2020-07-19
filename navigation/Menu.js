@@ -20,8 +20,8 @@ function CustomDrawerContent({
 }) {
   const insets = useSafeArea();
   const screens = [
-    "Profile",
-    "About",
+    "ПРОФІЛЬ",
+    "ІНФОРМАЦІЯ",
   ];
   return (
     <Block
@@ -50,7 +50,7 @@ function CustomDrawerContent({
               />
             </Block>
           </Block>
-        <DrawerCustomItem title="LOGOUT" navigation={navigation}/>
+        <DrawerCustomItem title="ВИХІД" navigation={navigation}/>
         </ScrollView>
       </Block>
     </Block>

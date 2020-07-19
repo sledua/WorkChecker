@@ -44,7 +44,7 @@ const MapScreen = ({navigation}) => {
                 region={mapRegion}
                 onPress={selectLocationHandler}
             >
-                {markerCoordinates && (<Marker title="Укажите точку" coordinate={markerCoordinates}/>)}
+                {markerCoordinates && (<Marker title="Вкажіть точку" coordinate={markerCoordinates}/>)}
             </MapView>
             <Block>
                 <Button

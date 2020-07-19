@@ -40,7 +40,7 @@ class DrawerItem extends React.Component {
             style={{ opacity: 0.5 }}
           />
         );
-      case "Profile":
+      case "ПРОФІЛЬ":
         return (
           <Icon
             name="user"
@@ -50,7 +50,7 @@ class DrawerItem extends React.Component {
             style={{ opacity: 0.5 }}
           />
         );
-      case "About":
+      case "ІНФОРМАЦІЯ":
         return (
             <Icon
                 name="map"
@@ -70,45 +70,7 @@ class DrawerItem extends React.Component {
             style={{ opacity: 0.5 }}
           />
         );
-      case "Settings":
-        return (
-          <Icon
-            name="home"
-            family="NowExtra"
-            size={18}
-            color={focused ? nowTheme.COLORS.PRIMARY : "white"}
-            style={{ opacity: 0.5 }}
-          />
-        );
-      case "Examples":
-        return (
-          <Icon
-            name="home"
-            family="NowExtra"
-            size={14}
-            color={focused ? nowTheme.COLORS.PRIMARY : "white"}
-          />
-        );
-      case "GETTING STARTED":
-        return (
-          <Icon
-            name="home"
-            family="NowExtra"
-            size={18}
-            style={{ borderColor: "rgba(0,0,0,0.5)", opacity: 0.5 }}
-            color={focused ? nowTheme.COLORS.PRIMARY : "white"}
-          />
-        );
-      case "LOGOUT":
-        return (
-          <Icon
-            name="loop2"
-            family="NowExtra"
-            size={18}
-            style={{ borderColor: "rgba(0,0,0,0.5)", opacity: 0.5 }}
-            color={focused ? nowTheme.COLORS.BLACK : "white"}
-          />
-        );
+
       default:
         return null;
     }
@@ -130,7 +92,7 @@ class DrawerItem extends React.Component {
             ? Linking.openURL(
                 "https://demos.creative-tim.com/now-ui-pro-react-native/docs/"
               ).catch(err => console.error("An error occurred", err))
-            : navigation.navigate(title == 'LOGOUT' ? 'Onboarding' : title)
+            : navigation.navigate(title == 'ВИХІД' ? 'Onboarding' : title)
         }
       >
         <Block flex row style={containerStyles}>

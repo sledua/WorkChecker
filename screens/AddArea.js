@@ -13,28 +13,30 @@ const AddArea = ({navigation, route}) =>  {
     const dispatch = useDispatch();
     const users = useSelector(state => state.worker.usersAdmin);
 
-
+    const userPikedLocation = route.params ? route.params.pickedLocation : null;
+    console.log('addArea', pickLocation)
     const [workTitle, setWorkTitle] = useState('');
     const [descriptions, setDescriptions] = useState('');
     const [workPlace, setWorkPlace] = useState('');
     const [isFetching, setIsFetching] = useState(false);
     const [pickLocation, setPickLocation] = useState();
     const [isShow, setShow] = useState(false)
-    const adminPhone = users.map(phone => phone.phone);
+    const adminPhone = users.map(phone => phone.phone.toString());
+    const adminPhoneRev = Object.assign({},adminPhone);
+    console.log(adminPhoneRev)
     const submitHandler = async (title, message) => {
         const users_area = {
-            phoneAdmin: adminPhone,
+            phoneAdmin: adminPhoneRev["0"],
             title: workTitle,
             descriptions: descriptions,
             place: pickLocation,
             timeAdd: formatTimer
         }
         dispatch(addPlace(users_area))
-        Alert.alert('Задача добавлена', `Задача ${workTitle} добавлена`, [{text: 'Ок'}])
+        Alert.alert('Іноформація', `Завдання ${workTitle} добавлено`, [{text: 'Ок'}])
     };
 
-    const userPikedLocation = route.params ? route.params.pickedLocation : null;
-    console.log('addArea', pickLocation)
+
     useEffect(() => {
 
         if(userPikedLocation) {
@@ -53,7 +55,7 @@ const AddArea = ({navigation, route}) =>  {
             )
         } catch (e) {
             console.log(e);
-            Alert.alert('Нет подключение', 'Повторите попытку через минуту, и повторите подключение к сети', [{text: 'Добре'}])
+            Alert.alert('Нет подключение', 'Повторите попытку через минуту, и повторите подключение к сети', [{text: 'Ок'}])
         }
         setIsFetching(false);
     }
@@ -63,19 +65,19 @@ const AddArea = ({navigation, route}) =>  {
     return (
         <Block style={styles.profileBackground} >
             <Block style={{ paddingHorizontal: 20, paddingTop: 100 }}>
-                <Text color={theme.COLORS.WHITE} size={18} bold>Название</Text>
+                <Text color={theme.COLORS.WHITE} size={18} bold>Назва</Text>
                 <Input
                     placeholder='название'
                     placeholderTextColor="#4F8EC9"
                     color={theme.COLORS.BLACK}
                     onChangeText={setWorkTitle}/>
-                <Text color={theme.COLORS.WHITE} size={18} bold>Краткое описание</Text>
+                <Text color={theme.COLORS.WHITE} size={18} bold>Інформація для користувача</Text>
                 <Input
                     placeholder='краткое описание'
                     placeholderTextColor="#4F8EC9"
                     color={theme.COLORS.BLACK}
                     onChangeText={setDescriptions}/>
-                <Text color={theme.COLORS.WHITE} size={18} bold>Координаты</Text>
+                <Text color={theme.COLORS.WHITE} size={18} bold>Координати</Text>
                 <Block>
                     <MapPreview style={styles.mapPreview} location={pickLocation}>
                     {isFetching ? (
@@ -92,7 +94,7 @@ const AddArea = ({navigation, route}) =>  {
                         color={theme.COLORS.GREY}
                         onPress={getLocation}
                     >
-                        <Text color={theme.COLORS.WHITE} bold>Мои координаты</Text>
+                        <Text color={theme.COLORS.WHITE} bold>Мої координаты</Text>
                     </Button>
                     <Button
                         style={{marginTop: 10, width: '48%', marginHorizontal: 10}}
@@ -100,7 +102,7 @@ const AddArea = ({navigation, route}) =>  {
                         color={theme.COLORS.GREY}
                         onPress={getLocationOnMap}
                     >
-                        <Text color={theme.COLORS.WHITE} bold>Указать точку на карте</Text>
+                        <Text color={theme.COLORS.WHITE} bold>Вказати точку на мапі</Text>
                     </Button>
                 </Block>
 

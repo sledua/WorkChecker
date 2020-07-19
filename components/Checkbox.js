@@ -12,7 +12,7 @@ export default class Checkbox extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      checked : props.checked || false
+      checked : props.checked || true
     };
   }
 

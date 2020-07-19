@@ -1,7 +1,7 @@
 import React from 'react';
 import {Image, StyleSheet} from 'react-native';
 import lets from "../env";
-import {Block, Text, theme} from "galio-framework";
+import {Block} from "galio-framework";
 const MapPreview = props => {
     let imagePreviewUrl;
     if (props.location) {

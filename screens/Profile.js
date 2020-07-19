@@ -1,19 +1,29 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import { StyleSheet, Dimensions, ImageBackground, Alert, Vibration } from 'react-native';
+import {
+  StyleSheet,
+  Dimensions,
+  ImageBackground,
+  Alert,
+  FlatList,
+  TouchableHighlight,
+  ActivityIndicator,
+    View
+} from 'react-native';
 import { Block, Text, theme, Button as GaButton } from 'galio-framework';
 import { Button } from '../components';
 import { Images, nowTheme } from '../constants';
 import {useSelector, useDispatch} from "react-redux";
 import {updateUser} from '../store/actions/worker';
 import * as Location from 'expo-location';
+import * as TaskManager from 'expo-task-manager';
 import {formatTimer} from "../model/timerDate";
 import * as Permissions from 'expo-permissions';
 import {Notifications} from "expo";
 import * as firebase from "firebase";
+import {LOCATION} from "expo-permissions";
 const { width, height } = Dimensions.get('screen');
-
 const thumbMeasure = (width - 48 - 32) / 3;
-
+const MY_LOCATION = 'My_location';
 async function readPermissions() {
   const result = await Permissions.askAsync(Permissions.LOCATION)
   if(result.status !== 'granted') {
@@ -22,17 +32,48 @@ async function readPermissions() {
   }
   return true;
 }
-
 const Profile = ({navigation}) => {
+  TaskManager.defineTask(MY_LOCATION, async ({ data, error }) => {
+    if (error) {
+      return;
+    }
+    if (data) {
+      const {locations} = data;
+      const name = users.map(f => f.id);
+      console.log('Received new locations', locations);
+      await fetch(`https://work-checker-b96e4.firebaseio.com/users/${name}/user.json`,
+          {
+            method: 'PATCH',
+            headers: {'Context-Type': 'application/json'},
+            body: JSON.stringify({bgLocations: locations})
+          }
+      )
+    }
+  });
 
   const users = useSelector(state => state.worker.usersAdmin);
   const dispatch = useDispatch();
 
   const [pickLocation, setPickLocation] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
-  const [butn, setButn] = useState(false)
-  const [workStart, setWorkStart] = useState(null)
-
+  const [butn, setButn] = useState(false);
+  const [ust, setUst] = useState();
+  const rt = users.filter(p=>p.rol.toString() === 'сотрудник')
+  const [onlyArea, setOnlyArea] = useState([]);
+  const getAllArea = async () => {
+    setIsFetching(true)
+    const response = await fetch('https://work-checker-b96e4.firebaseio.com/users_area.json',
+        {
+          method: 'GET',
+          headers: {'Context-Type': 'application/json'}
+        })
+    const data = await response.json();
+    const allArea = Object.keys(data).map(key => ({...data[key].users_area}))
+    const myAdminSelect = users.map(phone=>phone.phoneAdmin.toString())
+    const adminSelect = allArea.filter(p=>p.phoneAdmin !== myAdminSelect)
+    setOnlyArea(adminSelect)
+    setIsFetching(true)
+  }
   const getLocation = async () => {
     const hasPermission = await readPermissions();
     if(!hasPermission)
@@ -49,24 +90,50 @@ const Profile = ({navigation}) => {
         }
       )
     } catch (e) {
-      Alert.alert('Нет подключение', 'Повторите попытку через минуту, и повторите подключение к сети', [{text: 'Добре'}])
+      Alert.alert('Виникли питання', 'Не переймайтесь, всі данні записано', [{text: 'Добре'}])
     }
     setIsFetching(false);
   }
 
-  const rr = users.map(f=>f.workFlag.toString())
-  useEffect( () => {
-    getLocation().then(r => r);
-    checkStatus(rr);
-    console.log( rr, butn);
-  },[])
-  function checkStatus(rr) {
-    if (rr == 0) {
-      setButn(false)
-    } else {
-      setButn(true)
-    }
+  console.log(onlyArea);
+
+  const bgLocationStart = async () => {
+    await Location.startLocationUpdatesAsync(MY_LOCATION, {
+      accuracy: Location.Accuracy.Balanced,
+      timeInterval: 360000,
+      pausesUpdatesAutomatically: true,
+      activityType: Location.ActivityType.AutomotiveNavigation,
+      showsBackgroundLocationIndicator: true,
+    })
   }
+  const bgLocationStop = async () => {
+    await Location.stopLocationUpdatesAsync(MY_LOCATION)
+  }
+
+  useEffect(()=>{
+    getAllArea();
+  },[])
+  useEffect(()=>{
+
+    getLocation();
+    if(rt.length === 0) {
+      setUst(true)
+    } else {
+      setUst(false)
+    }
+    registerForPushNotifications();
+
+    const rr = users.map(f=>f.workFlag);
+    if (rr == 0) {
+      setButn(false);
+
+    } else {
+      setButn(true);
+      bgLocationStop();
+    }
+  },[])
+
+
   const registerForPushNotifications = async () => {
     const {status} = await Permissions.getAsync(Permissions.NOTIFICATIONS);
     let finalStatus = status;
@@ -86,9 +153,7 @@ const Profile = ({navigation}) => {
           body: JSON.stringify({idToken: token})
         })
   }
-  useEffect(() => {
-    registerForPushNotifications().then(r => r)
-  },[])
+
   const workUpdater = useCallback(() =>{
 
     const id = users.map(p => p.id);
@@ -98,20 +163,22 @@ const Profile = ({navigation}) => {
 
     if(rr == 0) {
       setButn(true)
-      Alert.alert('Приступая к задачи', 'Работа началась', [{text: 'Ok'}])
+      Alert.alert('Інформація', 'Передача данних почалась', [{text: 'Ok'}])
       const workFlag = '1'
+      bgLocationStart().then(r => r);
       dispatch(updateUser(id, workFlag, location, timer))
     } else {
       setButn(false)
-      Alert.alert('Закончили', 'Спасибо', [{text: 'Ok'}])
+      Alert.alert('Інформація', 'Дякую', [{text: 'Ok'}]);
+      bgLocationStop().then(r => r);
       const workFlag = '0'
       const timer = {'timeStop': formatTimer}
       dispatch(updateUser(id, workFlag, location, timer))
     }
   },[])
-  const isLoad = users.map(f=>f.rol.toString());
-  const [lod, setLoad] = useState(false)
-    return (
+
+
+  return (
         <Block style={{
           flex: 1,
           flexDirection: 'column',
@@ -153,7 +220,6 @@ const Profile = ({navigation}) => {
                             lineHeight: 20,
                             fontWeight: 'bold',
                             fontSize: 18,
-                            opacity: .8
                           }}
                       >
                         {users.map(r => r.rol)}
@@ -163,12 +229,12 @@ const Profile = ({navigation}) => {
                 </Block>
                 <Block
                     middle
-                    style={{position: 'absolute', width: width, top: height * 0.3 - 22, zIndex: 99}}
+                    style={{position: 'absolute', width: width, top: height * 0.3 - 22, zIndex: 99, }}
                 >
                   <Button style={{
                     width: 114,
                     height: 44,
-                    marginHorizontal: 5,
+                    paddingHorizontal: 5,
                     elevation: 0
                   }}
                           textStyle={{fontSize: 16}} round
@@ -177,59 +243,62 @@ const Profile = ({navigation}) => {
                     {butn ? 'Не працюю' : 'Працюю'}
                   </Button>
                   {butn ?
-                      <Text p style={{backgroundColor: theme.COLORS.SUCCESS, color: theme.COLORS.WHITE}}>Використовуються
+                      (<Block style={{height: 90}}>
+                      <Text style={{backgroundColor: theme.COLORS.SUCCESS, color: theme.COLORS.WHITE, zIndex: 100, height: 150}} bold size={18}>Використовуються
                         Ваша геолокація,
-                        щоб вимкнути натисніть “Не працюю”</Text> : null}
+                        щоб вимкнути натисніть “Не працюю”</Text></Block>) : null}
                 </Block>
               </Block>
             </ImageBackground>
           </Block>
           <Block/>
-          <Block flex={1} style={{padding: theme.SIZES.BASE, marginTop: 50}}>
+          <Block flex={1} style={{padding: theme.SIZES.BASE, marginTop: 50, backgroundColor: theme.COLORS.FACEBOOK}}>
             <Block flex style={{marginTop: 10}}>
-              <Block row style={{paddingVertical: 14, paddingHorizontal: 15}}>
-                <Text bold size={17} color="#2c2c2c">
+              <Block  style={{paddingVertical: 14, paddingHorizontal: 15}}>
+                <Text bold size={18} color={theme.COLORS.WHITE}>
                   Статус:
                 </Text>
-                <Text size={17}>{butn ? 'В работе' : 'Не працюю'}</Text>
+                <Text size={17} color={theme.COLORS.WHITE}>{butn ? 'В работе' : 'Не працюю'}</Text>
               </Block>
             </Block>
-            <Block
-                middle
-                row
-                style={{zIndex: 99}}
-            >
-              <Button style={{
-                height: 44,
-                marginHorizontal: 5,
-                marginVertical: 10,
-                elevation: 0
-              }}
-                      textStyle={{fontSize: 16}}
-                      onPress={() => navigation.navigate('AddArea')}
-              >
-                Добавить рабочую область
-              </Button>
+            <Block flex={6} style={{zIndex: 99, paddingHorizontal: 15, }}>
+              {isFetching ?(<View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}><ActivityIndicator size="large" color={theme.COLORS.PRIMARY}/></View>):(<FlatList
+                  data={onlyArea}
+                  keyExtractor={item => item.id.toString()}
+                  renderItem={({item}) =>
+                      <Block style={{paddingVertical: 5}}>
+                        <Text bold size={18} color={theme.COLORS.WHITE}
+                              style={{fontFamily: 'montserrat-bold',}}>Завдання</Text>
+                        <Text size={16} color={theme.COLORS.WHITE}>{item.title}</Text>
+                        <Text bold size={18} color={theme.COLORS.WHITE}
+                              style={{fontFamily: 'montserrat-bold',}}>Опис</Text>
+                        <Text size={16} color={theme.COLORS.WHITE}>{item.descriptions}</Text>
+                      </Block>
+                  }
+              />)}
             </Block>
-            <Block
-                middle
-                row
-                style={{zIndex: 99}}
-            >
-              <Button style={{
-                height: 44,
-                marginHorizontal: 5,
-                elevation: 0
-              }}
+            {ust ? (<Block middle row style={{zIndex: 99}}>
+              <Button style={{height: 44, marginHorizontal: 5, marginVertical: 10, elevation: 0}}
                       textStyle={{fontSize: 16}}
-                      onPress={() => navigation.navigate('Add')}>
-                Добавить сотрудника
+                      onPress={() => navigation.navigate('AddArea')}>
+                Додати завдання
               </Button>
-            </Block>
+              </Block>) : null}
+            {ust ? (<Block middle row style={{zIndex: 99}}>
+              <Button style={{height: 44,
+              marginHorizontal: 5,
+              elevation: 0
+            }}
+              textStyle={{fontSize: 16}}
+              onPress={() => navigation.navigate('Add')}>
+              Додати співробітника
+              </Button>
+              </Block>) : null}
           </Block>
         </Block>
 
     )
+
 }
 const styles = StyleSheet.create({
 
@@ -237,11 +306,13 @@ const styles = StyleSheet.create({
     width,
     height,
     padding: 0,
-    zIndex: -1
+    zIndex: -1,
+    backgroundColor: theme.COLORS.FACEBOOK
   },
   profileBackground: {
     width,
-    height: height * 0.3
+    height: height * 0.3,
+    backgroundColor: theme.COLORS.FACEBOOK
   },
 
   info: {
@@ -280,3 +351,5 @@ const styles = StyleSheet.create({
 });
 
 export default Profile;
+
+

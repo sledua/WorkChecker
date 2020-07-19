@@ -4,7 +4,7 @@ import {
   ImageBackground,
   Dimensions,
   TouchableWithoutFeedback,
-  Keyboard, Alert,
+  Keyboard, Alert, ActivityIndicator
 } from 'react-native';
 import { Block, Checkbox, Text, theme } from 'galio-framework';
 import { Button, Icon, Input } from '../components';
@@ -26,10 +26,12 @@ const Register = ({navigation}) => {
 
   const dispatch = useDispatch();
   const tokens = useSelector(state => state.worker.usersAdmin);
-  const [inputPhone, setInputPhone] = useState('')
-  const [code, setCode] = useState('');
+  const [inputPhone, setInputPhone] = useState(null)
+  const [code, setCode] = useState(null);
   const [verificationId, setVerificationId] = useState(null);
   const recaptchaVerifier = useRef(null);
+  const [onlyPhone, setOnlyPhone] = useState([]);
+  const [isLoading, setIsLoading] = useState(false)
   const userToken = tokens;
 
   const getAllPhone = async () => {
@@ -40,45 +42,58 @@ const Register = ({navigation}) => {
       })
   const data = await response.json();
   const allUsers = Object.keys(data).map(key => ({...data[key].user}))
-  // const rt = allUsers.map(p=>p.phone)
-  // setOnlyPhone(rt.filter(p => p === inputPhone));
-  // console.log(rt, inputPhone, onlyPhone);
+  const rt = allUsers.map(p=>p.phone.toString())
+    setOnlyPhone(rt)
 }
 
   useEffect( ()=>{
-    getAllPhone();
+    getAllPhone().then(r=>r);
   },[])
 
   const authInApp = async () => {
-
-    if(!inputPhone) {
-        Alert.alert('Ошибка','Учетной записи нет, обратитесь к администратору', [{text: 'Добре'}])
+    const rj = onlyPhone.filter(p => p === inputPhone);
+    console.log(rj);
+    if(rj.length === 0) {
+        Alert.alert('Нажаль','Нажаль ви ще не маете аккаунт, зверніться до адміністратора', [{text: 'Ok'}])
     } else {
-      Alert.alert('Инфо','Ожидайте смс для входа')
-      const phoneProvider = await new firebase.auth.PhoneAuthProvider();
-      phoneProvider
-          .verifyPhoneNumber(inputPhone, recaptchaVerifier.current)
-          .then(setVerificationId);
+      Alert.alert('Инфо','Ожидайте смс для входа', [{text: 'Ok'}]);
+      try{
+        const phoneProvider = await new firebase.auth.PhoneAuthProvider();
+        phoneProvider.verifyPhoneNumber(inputPhone, recaptchaVerifier.current).then(setVerificationId);
+        await dispatch(runForUsers(inputPhone))
+      }catch (e) {
+        console.log('SMS',e)
+      }
+
+
     }
-    await dispatch(runForUsers(inputPhone))
+
   }
   const confirmCode = async () => {
-    // if(!verificationId){
-    //   Alert.alert('Ошибка','Сесия устарела, повторите отправке смс', [{text: 'Добре'}])
-    // }
-    // const credential = await firebase.auth.PhoneAuthProvider.credential(
-    //     verificationId,
-    //     code
-    // );
-    // await firebase
-    //     .auth()
-    //     .signInWithCredential(credential)
-    //     .then((result) => {
-    //       console.log(result);
-    //     });
-    // await dispatch(loginUser(verificationId)
-    await dispatch(runForUsers(inputPhone))
-    await navigation.navigate("App")
+    if(verificationId){
+      Alert.alert('Ошибка','Сесия устарела, повторите отправке смс', [{text: 'Добре'}])
+    } else {
+      setIsLoading(true)
+      try{
+        const credential = await firebase.auth.PhoneAuthProvider.credential(
+            verificationId,
+            code
+        );
+        await firebase
+            .auth()
+            .signInWithCredential(credential)
+            .then((result) => {
+              console.log(result);
+            });
+        navigation.navigate("App")
+      }catch (e) {
+        console.log('code error', e);
+        setIsLoading(false);
+        Alert.alert('Ошибка','Сесия устарела, повторите отправке смс', [{text: 'Добре'}])
+      }
+
+    }
+
   };
   return (
         <DismissKeyboard>
@@ -120,6 +135,8 @@ const Register = ({navigation}) => {
                                   autoCompleteType="tel"
                                   style={styles.inputs}
                                   onChangeText={setInputPhone}
+                                  keyboardType="phone-pad"
+                                  textContentType="telephoneNumber"
                                   iconContent={
                                     <Icon
                                         size={16}
@@ -133,7 +150,7 @@ const Register = ({navigation}) => {
                             </Block>
                             <Block width={width * 0.8} style={{ marginBottom: 5 }}>
                               <Input
-                                  placeholder="Пароль"
+                                  placeholder="Код з СМС"
                                   viewPass
                                   style={styles.inputs}
                                   onChangeText={setCode}
@@ -183,21 +200,22 @@ const Register = ({navigation}) => {
                                 Відправити пароль
                               </Text>
                             </Button>
-                          </Block>
-                          <Block center>
-                            <Button
-                                color="primary"
-                                round
-                                style={styles.createButton}
-                                onPress={confirmCode}>
-                              <Text
-                                  style={{ fontFamily: 'montserrat-bold' }}
-                                  size={14}
-                                  color={nowTheme.COLORS.WHITE}
-                              >
-                                Вход
-                              </Text>
-                            </Button>
+                            {isLoading ?
+                                (<ActivityIndicator size="small"/>)
+                                :(<Button
+                                    color="primary"
+                                    round
+                                    style={styles.createButton}
+                                    onPress={confirmCode}>
+                                  <Text
+                                      style={{fontFamily: 'montserrat-bold'}}
+                                      size={14}
+                                      color={nowTheme.COLORS.WHITE}
+                                  >
+                                    Вхід
+                                  </Text>
+                                </Button>)
+                            }
                           </Block>
                         </Block>
                       </Block>
@@ -277,8 +295,8 @@ const styles = StyleSheet.create({
   },
   createButton: {
     width: width * 0.5,
-    marginTop: 25,
-    marginBottom: 5
+    marginVertical: 10
+
   },
   social: {
     width: theme.SIZES.BASE * 3.5,

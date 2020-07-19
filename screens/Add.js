@@ -11,13 +11,10 @@ const { width, height } = Dimensions.get('screen');
 
 const Add = ({navigation}) =>  {
     const dispatch = useDispatch();
-    const users_area = useSelector(state => state.placer.usersArea);
     const users = useSelector(state => state.worker.usersAdmin);
 
 
     const adminPhone = users.map(phone => phone.phone);
-    //const users_value = users_area.map(value => value.title);
-    //console.log('users',users_value);
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [valueInBase, setValueInBase] = useState([]);
@@ -48,13 +45,13 @@ const Add = ({navigation}) =>  {
             name: name,
             phone: phone,
             select: value,
-            rol: 'сотрудник',
+            rol: 'співробітник',
             location: '',
             workFlag: '0',
             timeAdd: formatTimer
         }
        dispatch(addUser(user))
-        Alert.alert('Сотрудник добавлен', `Сотрудник ${name} добавлен(а), на задание ${value}`, [{text: 'Ок'}])
+        Alert.alert('Інформація', `Співробітник ${name} добавлений(а), на завдання ${value}`, [{text: 'Ок'}])
     };
 
 
@@ -62,19 +59,19 @@ const Add = ({navigation}) =>  {
         <Block style={styles.profileBackground} >
             <Block  style={{ paddingHorizontal: 20, paddingTop: 100, position: 'absolute'}}>
 
-                    <Text color={theme.COLORS.WHITE} size={18} bold>ФИО сотрудника</Text>
+                    <Text color={theme.COLORS.WHITE} size={18} bold>ФІО співробітника</Text>
                     <Input
                       placeholder='Введите ФИО'
                       placeholderTextColor="#4F8EC9"
                       color={theme.COLORS.BLACK}
                       onChangeText={setName}/>
-                    <Text color={theme.COLORS.WHITE} size={18} bold>Телефон сотрудника</Text>
+                    <Text color={theme.COLORS.WHITE} size={18} bold>Телефон співробітника</Text>
                     <Input
                       placeholder='+380934666049'
                       placeholderTextColor="#4F8EC9"
                       color={theme.COLORS.BLACK}
                       onChangeText={setPhone}/>
-                    <Text color={theme.COLORS.WHITE} size={18} bold>Рабочая область</Text>
+                    <Text color={theme.COLORS.WHITE} size={18} bold>Виберіть завдання</Text>
                     <ModalDropdown
                         style={styles.qty}
                         onSelect={handleOnSelect}
@@ -99,7 +96,7 @@ const Add = ({navigation}) =>  {
                     onPress={submitHandler}
                     disabled={!name && !phone}
                     >
-                    Добавить пользователя
+                    Додати співробітника
                 </Button>
             </Block>
         </Block>

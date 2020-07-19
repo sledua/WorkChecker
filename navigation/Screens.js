@@ -52,7 +52,7 @@ function AboutStack(props) {
                 options={{
                     header: ({ navigation, scene }) => (
                         <Header
-                            title="About"
+                            title="О приложении"
                             back
                             white
                             transparent
@@ -129,13 +129,6 @@ function AddAreaStack(props) {
         </Stack.Navigator>
     );
 }
-// function MapScreenStack(props) {
-//     return(
-//         <Stack.Navigator initialRouteName="MapScreen" mode="card" headerMode="screen">
-//
-//         </Stack.Navigator>
-//     );
-// }
 function ProfileStack(props) {
   return (
     <Stack.Navigator initialRouteName="Profile" mode="card" headerMode="screen">
@@ -147,7 +140,7 @@ function ProfileStack(props) {
             <Header
               transparent
               white
-              title="Profile"
+              title=""
               navigation={navigation}
               scene={scene}
             />
