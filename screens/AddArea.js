@@ -85,7 +85,7 @@ const AddArea = ({navigation, route}) =>  {
                     {isFetching ? (
                         <ActivityIndicator size="large" color={theme.COLORS.PRIMARY}/>
                         ) : (
-                        <Text>error</Text>
+                        <Text color={theme.COLORS.WHITE}>Виберіть локацію</Text>
                     )}
                     </MapPreview>
                 </Block>

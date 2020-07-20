@@ -13,8 +13,6 @@ import {useDispatch, useSelector} from "react-redux";
 import {loginUser, runForUsers} from "../store/actions/worker";
 import firebase from "../firebase";
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
-import * as Permissions from 'expo-permissions';
-import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 const { width, height } = Dimensions.get('screen');
 
@@ -22,7 +20,7 @@ const DismissKeyboard = ({ children }) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>{children}</TouchableWithoutFeedback>
 );
 
-const Register = ({navigation}) => {
+const Register = ({navigation}, props) => {
 
   const dispatch = useDispatch();
   const tokens = useSelector(state => state.worker.usersAdmin);
@@ -32,8 +30,9 @@ const Register = ({navigation}) => {
   const recaptchaVerifier = useRef(null);
   const [onlyPhone, setOnlyPhone] = useState([]);
   const [isLoading, setIsLoading] = useState(false)
-  const userToken = tokens;
-
+  const [box, setBox] = useState(false)
+  const [buttonColor, setButtonColor] = useState('transparent')
+  const [codeLoad, setCodeLoad] = useState(false)
   const getAllPhone = async () => {
   const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
       {
@@ -42,7 +41,7 @@ const Register = ({navigation}) => {
       })
   const data = await response.json();
   const allUsers = Object.keys(data).map(key => ({...data[key].user}))
-  const rt = allUsers.map(p=>p.phone.toString())
+  const rt = allUsers.map(p=>p.phone)
     setOnlyPhone(rt)
 }
 
@@ -51,7 +50,8 @@ const Register = ({navigation}) => {
   },[])
 
   const authInApp = async () => {
-    const rj = onlyPhone.filter(p => p === inputPhone);
+    const getFormatPhone = '+380'+inputPhone;
+    const rj = onlyPhone.filter(p => p === getFormatPhone);
     console.log(rj);
     if(rj.length === 0) {
         Alert.alert('Нажаль','Нажаль ви ще не маете аккаунт, зверніться до адміністратора', [{text: 'Ok'}])
@@ -59,15 +59,13 @@ const Register = ({navigation}) => {
       Alert.alert('Инфо','Ожидайте смс для входа', [{text: 'Ok'}]);
       try{
         const phoneProvider = await new firebase.auth.PhoneAuthProvider();
-        phoneProvider.verifyPhoneNumber(inputPhone, recaptchaVerifier.current).then(setVerificationId);
-        await dispatch(runForUsers(inputPhone))
+        phoneProvider.verifyPhoneNumber(getFormatPhone, recaptchaVerifier.current).then(setVerificationId);
+        await dispatch(runForUsers(getFormatPhone))
+        setCodeLoad(!codeLoad)
       }catch (e) {
         console.log('SMS',e)
       }
-
-
     }
-
   }
   const confirmCode = async () => {
     if(!verificationId){
@@ -95,6 +93,7 @@ const Register = ({navigation}) => {
     }
 
   };
+
   return (
         <DismissKeyboard>
           <Block flex middle>
@@ -103,15 +102,16 @@ const Register = ({navigation}) => {
                 style={styles.imageBackgroundContainer}
                 imageStyle={styles.imageBackground}
             >
-              <FirebaseRecaptchaVerifierModal
-                  ref={recaptchaVerifier}
-                  firebaseConfig={Constants.manifest.extra.firebase}
-              />
               <Block flex middle>
                 <Block style={styles.registerContainer}>
-                  <Block flex space="evenly">
-                    <Block flex={0.4} middle style={styles.socialConnect}>
-                      <Block flex={0.5} middle>
+                  <FirebaseRecaptchaVerifierModal
+                      ref={recaptchaVerifier}
+                      firebaseConfig={Constants.manifest.extra.firebase}
+                      title='Капча!'
+                      cancelLabel='Закрити'
+                  />
+                    <Block flex middle space="evenly">
+                      <Block style={{marginTop: 30, marginBottom: -20}}>
                         <Text
                             style={{
                               fontFamily: 'montserrat-regular',
@@ -123,15 +123,10 @@ const Register = ({navigation}) => {
                           Авторизація
                         </Text>
                       </Block>
-
-                    </Block>
-                    <Block flex={1} middle space="between">
-                      <Block center flex={0.9}>
-                        <Block flex space="between">
-                          <Block>
-                            <Block width={width * 0.8} style={{ marginBottom: 5 }}>
+                        {!codeLoad ?
+                            (<Block width={width * 0.8} style={{marginBottom: -10}}>
                               <Input
-                                  placeholder="+38 097 209 56 28"
+                                  placeholder="Номер телефону"
                                   autoCompleteType="tel"
                                   style={styles.inputs}
                                   onChangeText={setInputPhone}
@@ -143,12 +138,14 @@ const Register = ({navigation}) => {
                                         color="#ADB5BD"
                                         name="phone"
                                         family="NowExtra"
-                                        style={styles.inputIcons}
+                                        style={styles.inputIconsPhone}
                                     />
                                   }
                               />
-                            </Block>
-                            <Block width={width * 0.8} style={{ marginBottom: 5 }}>
+                              <Text style={{position: 'absolute', left: 45, top: 20}}>
+                                +(380)</Text>
+                            </Block>) :
+                            (<Block width={width * 0.8} style={{ marginBottom: -10 }}>
                               <Input
                                   placeholder="Код з СМС"
                                   viewPass
@@ -164,63 +161,69 @@ const Register = ({navigation}) => {
                                     />
                                   }
                               />
-                            </Block>
-                            <Block
-                                style={{ marginVertical: theme.SIZES.BASE, marginLeft: 15}}
-                                row
-                                width={width * 0.75}
+                            </Block>)}
+
+                        <Block
+                            row
+                            middle
+                            width={width * 0.8}
+                            style={{marginTop: -30, marginLeft: -17}}
+                        >
+                          <Checkbox
+                              onChange={() => {
+                                setBox(!box)
+                                setButtonColor('primary')
+                              }}
+                              checkboxStyle={{
+                                borderWidth: 1,
+                                borderRadius: 2,
+                                borderColor: '#bbbaba'
+                              }}
+                              color={nowTheme.COLORS.PRIMARY}
+                              labelStyle={{
+                                color: nowTheme.COLORS.HEADER,
+                                fontFamily: 'montserrat-regular',
+                                fontSize: 10,
+                              }}
+                              label=""
+                          />
+                          <Text size={17} style={{color: theme.COLORS.MUTED,width: width * 0.65, paddingLeft: 10}}>
+                            Даю згоду на використання персональних даних для ідентифікації на сервісі
+                          </Text>
+                        </Block>
+
+                      <Block>
+                          {!codeLoad ?(<Button
+                              color={buttonColor}
+                              round
+                              style={styles.createButton}
+                              onPress={authInApp}
+                              disabled={box}>
+                            <Text
+                                style={{fontFamily: 'montserrat-bold'}}
+                                size={14}
+                                color={nowTheme.COLORS.WHITE}
                             >
-                              <Checkbox
-                                  checkboxStyle={{
-                                    borderWidth: 1,
-                                    borderRadius: 2,
-                                    borderColor: '#E3E3E3'
-                                  }}
-                                  color={nowTheme.COLORS.PRIMARY}
-                                  labelStyle={{
-                                    color: nowTheme.COLORS.HEADER,
-                                    fontFamily: 'montserrat-regular',
-                                    fontSize: 10,
-                                  }}
-                                  label="Даю згоду на використання персональних даних для ідентифікації на сервісі"
-                              />
-                            </Block>
-                          </Block>
-                          <Block center>
-                            <Button
+                              Відправити пароль
+                            </Text>
+                          </Button>)
+                            :(<Button
                                 color="primary"
                                 round
                                 style={styles.createButton}
-                                onPress={authInApp}>
+                                onPress={confirmCode}>
                               <Text
-                                  style={{ fontFamily: 'montserrat-bold' }}
+                                  style={{fontFamily: 'montserrat-bold'}}
                                   size={14}
                                   color={nowTheme.COLORS.WHITE}
                               >
-                                Відправити пароль
+                                Увійти
                               </Text>
-                            </Button>
-                            {isLoading ?
-                                (<ActivityIndicator size="small"/>)
-                                :(<Button
-                                    color="primary"
-                                    round
-                                    style={styles.createButton}
-                                    onPress={confirmCode}>
-                                  <Text
-                                      style={{fontFamily: 'montserrat-bold'}}
-                                      size={14}
-                                      color={nowTheme.COLORS.WHITE}
-                                  >
-                                    Вхід
-                                  </Text>
-                                </Button>)
-                            }
-                          </Block>
+                            </Button>)
+                          }
                         </Block>
-                      </Block>
+                      <Block>{box ? (<Text>Необхідно погодитись з нашими правілами</Text>) : <Text style={{color: nowTheme.COLORS.WHITE}}>OO</Text>}</Block>
                     </Block>
-                  </Block>
                 </Block>
               </Block>
             </ImageBackground>
@@ -243,7 +246,7 @@ const styles = StyleSheet.create({
   registerContainer: {
     marginTop: 55,
     width: width * 0.9,
-    height: height < 812 ? height * 0.8 : height * 0.8,
+    height: height < 812 ? height * 0.6 : height * 0.5,
     backgroundColor: nowTheme.COLORS.WHITE,
     borderRadius: 4,
     shadowColor: nowTheme.COLORS.BLACK,
@@ -256,31 +259,12 @@ const styles = StyleSheet.create({
     elevation: 1,
     overflow: 'hidden'
   },
-  socialConnect: {
-    backgroundColor: nowTheme.COLORS.WHITE
-    // borderBottomWidth: StyleSheet.hairlineWidth,
-    // borderColor: "rgba(136, 152, 170, 0.3)"
-  },
-  socialButtons: {
-    width: 120,
-    height: 40,
-    backgroundColor: '#fff',
-    shadowColor: nowTheme.COLORS.BLACK,
-    shadowOffset: {
-      width: 0,
-      height: 4
-    },
-    shadowRadius: 8,
-    shadowOpacity: 0.1,
-    elevation: 1
-  },
-  socialTextButtons: {
-    color: nowTheme.COLORS.PRIMARY,
-    fontWeight: '800',
-    fontSize: 14
-  },
   inputIcons: {
-    marginRight: 12,
+    marginRight: 15,
+    color: nowTheme.COLORS.ICON_INPUT
+  },
+  inputIconsPhone: {
+    marginRight: 56,
     color: nowTheme.COLORS.ICON_INPUT
   },
   inputs: {
@@ -288,22 +272,12 @@ const styles = StyleSheet.create({
     borderColor: '#E3E3E3',
     borderRadius: 21.5
   },
-  passwordCheck: {
-    paddingLeft: 2,
-    paddingTop: 6,
-    paddingBottom: 15
-  },
   createButton: {
-    width: width * 0.5,
-    marginVertical: 10
+    width: width * 0.4,
+    //marginVertical: 10
+    marginBottom: 10,
+    marginTop: -30
 
-  },
-  social: {
-    width: theme.SIZES.BASE * 3.5,
-    height: theme.SIZES.BASE * 3.5,
-    borderRadius: theme.SIZES.BASE * 1.75,
-    justifyContent: 'center',
-    marginHorizontal: 10
   }
 });
 

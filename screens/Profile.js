@@ -57,8 +57,7 @@ const Profile = ({navigation}) => {
   const [pickLocation, setPickLocation] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
   const [butn, setButn] = useState(false);
-  const [ust, setUst] = useState();
-  const rt = users.filter(p=>p.rol.toString() === 'сотрудник')
+  const [ust, setUst] = useState(false);
   const [onlyArea, setOnlyArea] = useState([]);
   const getAllArea = async () => {
     setIsFetching(true)
@@ -69,7 +68,7 @@ const Profile = ({navigation}) => {
         })
     const data = await response.json();
     const allArea = Object.keys(data).map(key => ({...data[key].users_area}))
-    const myAdminSelect = users.map(phone=>phone.phoneAdmin.toString())
+    const myAdminSelect = users.map(phone=>phone.phoneAdmin)
     const adminSelect = allArea.filter(p=>p.phoneAdmin !== myAdminSelect)
     setOnlyArea(adminSelect)
     setIsFetching(true)
@@ -94,9 +93,6 @@ const Profile = ({navigation}) => {
     }
     setIsFetching(false);
   }
-
-  console.log(onlyArea);
-
   const bgLocationStart = async () => {
     await Location.startLocationUpdatesAsync(MY_LOCATION, {
       accuracy: Location.Accuracy.Balanced,
@@ -109,12 +105,13 @@ const Profile = ({navigation}) => {
   const bgLocationStop = async () => {
     await Location.stopLocationUpdatesAsync(MY_LOCATION)
   }
-
+  const rt = users.filter(p=>p.rol.toString() === 'співробітник')
+  const rr = users.filter(f=>f.workFlag.toString() === '0');
+  console.log(rr)
   useEffect(()=>{
     getAllArea();
   },[])
   useEffect(()=>{
-
     getLocation();
     if(rt.length === 0) {
       setUst(true)
@@ -122,14 +119,10 @@ const Profile = ({navigation}) => {
       setUst(false)
     }
     registerForPushNotifications();
-
-    const rr = users.map(f=>f.workFlag);
-    if (rr == 0) {
+    if (rr.length !== 0) {
       setButn(false);
-
     } else {
       setButn(true);
-      bgLocationStop();
     }
   },[])
 
@@ -137,21 +130,24 @@ const Profile = ({navigation}) => {
   const registerForPushNotifications = async () => {
     const {status} = await Permissions.getAsync(Permissions.NOTIFICATIONS);
     let finalStatus = status;
+    try{
+      if(status !== 'granted') {
+        const {status} = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+        finalStatus = status;
+      }
+      if(finalStatus !== 'granted'){return; }
 
-    if(status !== 'granted') {
-      const {status} = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-      finalStatus = status;
+      let token = await Notifications.getExpoPushTokenAsync();
+      const name = users.map(f=>f.id);
+      await fetch(`https://work-checker-b96e4.firebaseio.com/users/${name}/user.json`,
+          {method: 'PATCH',
+            headers: {'Context-Type': 'application/json'},
+            body: JSON.stringify({idToken: token})
+          })
+    }catch (e) {
+      console.log("token", e)
     }
-    if(finalStatus !== 'granted'){return; }
 
-    let token = await Notifications.getExpoPushTokenAsync();
-    console.log('push',token);
-    const name = users.map(f=>f.id);
-    await fetch(`https://work-checker-b96e4.firebaseio.com/users/${name}/user.json`,
-        {method: 'PATCH',
-          headers: {'Context-Type': 'application/json'},
-          body: JSON.stringify({idToken: token})
-        })
   }
 
   const workUpdater = useCallback(() =>{
@@ -159,9 +155,10 @@ const Profile = ({navigation}) => {
     const id = users.map(p => p.id);
     const location = pickLocation;
     const timer = {'timeStart': formatTimer}
-    const rr = users.map(f=>f.workFlag.toString())
+    const rr = users.filter(f=>f.workFlag.toString() === '0')
+    console.log(rr);
 
-    if(rr == 0) {
+    if(rr.length !== 0) {
       setButn(true)
       Alert.alert('Інформація', 'Передача данних почалась', [{text: 'Ok'}])
       const workFlag = '1'
@@ -242,15 +239,23 @@ const Profile = ({navigation}) => {
                   >
                     {butn ? 'Не працюю' : 'Працюю'}
                   </Button>
-                  {butn ?
-                      (<Block style={{height: 90}}>
-                      <Text style={{backgroundColor: theme.COLORS.SUCCESS, color: theme.COLORS.WHITE, zIndex: 100, height: 150}} bold size={18}>Використовуються
-                        Ваша геолокація,
-                        щоб вимкнути натисніть “Не працюю”</Text></Block>) : null}
                 </Block>
               </Block>
             </ImageBackground>
           </Block>
+          {butn ?
+              (<Block style={{marginTop: height < 812 ? 45 :10, marginHorizontal: 25}}>
+                <Text style={{backgroundColor: theme.COLORS.SUCCESS,
+                  color: theme.COLORS.WHITE,
+                  width: '100%',
+                  zIndex: 100,
+                  padding: 5,
+                  position: "absolute",
+                  left: 0,
+                  top: 0}}
+                      bold size={18}>Використовуються
+                  Ваша геолокація,
+                  щоб вимкнути натисніть “Не працюю”</Text></Block>) : null}
           <Block/>
           <Block flex={1} style={{padding: theme.SIZES.BASE, marginTop: 50, backgroundColor: theme.COLORS.FACEBOOK}}>
             <Block flex style={{marginTop: 10}}>
@@ -258,24 +263,31 @@ const Profile = ({navigation}) => {
                 <Text bold size={18} color={theme.COLORS.WHITE}>
                   Статус:
                 </Text>
-                <Text size={17} color={theme.COLORS.WHITE}>{butn ? 'В работе' : 'Не працюю'}</Text>
+                <Text size={17} color={theme.COLORS.WHITE}>{butn ? 'В роботі' : 'Не працюю'}</Text>
               </Block>
             </Block>
             <Block flex={6} style={{zIndex: 99, paddingHorizontal: 15, }}>
-              {isFetching ?(<View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}><ActivityIndicator size="large" color={theme.COLORS.PRIMARY}/></View>):(<FlatList
-                  data={onlyArea}
-                  keyExtractor={item => item.id.toString()}
-                  renderItem={({item}) =>
-                      <Block style={{paddingVertical: 5}}>
-                        <Text bold size={18} color={theme.COLORS.WHITE}
-                              style={{fontFamily: 'montserrat-bold',}}>Завдання</Text>
-                        <Text size={16} color={theme.COLORS.WHITE}>{item.title}</Text>
-                        <Text bold size={18} color={theme.COLORS.WHITE}
-                              style={{fontFamily: 'montserrat-bold',}}>Опис</Text>
-                        <Text size={16} color={theme.COLORS.WHITE}>{item.descriptions}</Text>
-                      </Block>
-                  }
-              />)}
+              {ust ?
+                  null :
+                  (<View>
+                    {isFetching ?
+                        (<View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                          <ActivityIndicator size="large" color={theme.COLORS.PRIMARY}/></View>)
+                        :(<FlatList
+                            data={onlyArea}
+                            keyExtractor={item => item.id.toString()}
+                            renderItem={({item}) =>
+                                <Block style={{paddingVertical: 5}}>
+                                  <Text bold size={18} color={theme.COLORS.WHITE}
+                                        style={{fontFamily: 'montserrat-bold',}}>Завдання</Text>
+                                  <Text size={16} color={theme.COLORS.WHITE}>{item.title}</Text>
+                                  <Text bold size={18} color={theme.COLORS.WHITE}
+                                        style={{fontFamily: 'montserrat-bold',}}>Опис</Text>
+                                  <Text size={16} color={theme.COLORS.WHITE}>{item.descriptions}</Text>
+                                </Block>
+                            }
+                        />)}
+                  </View>)}
             </Block>
             {ust ? (<Block middle row style={{zIndex: 99}}>
               <Button style={{height: 44, marginHorizontal: 5, marginVertical: 10, elevation: 0}}
