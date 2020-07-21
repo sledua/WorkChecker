@@ -1,7 +1,3 @@
-//TODO: Организовать обертки под запросы
-//TODO: Фоновая локация пользователя
-//TODO: СМС логин
-//TODO: Привести в переведенный вид под целевой язык
 import React from 'react';
 import { Image } from 'react-native';
 import { AppLoading } from 'expo';

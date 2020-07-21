@@ -2,6 +2,7 @@ export const CREATE_USER = 'CREATE_PRODUCT';
 export const UPDATE_USER = 'UPDATE_USER';
 export const RUN_FOR_USERS = 'RUN_FOR_USERS';
 export const ADD_PLACE = 'ADD_PLACE';
+export const ADD_AREA = 'ADD_AREA';
 export const LOGIN = 'LOGIN';
 
 export const loginUser = verificationId => async dispatch => {
@@ -61,6 +62,24 @@ export const addPlace = users_area => async  dispatch => {
         })
     dispatch({
         type: ADD_PLACE,
+        payload
+    })
+}
+export const addAreas = area => async  dispatch => {
+    const response = await fetch('https://work-checker-b96e4.firebaseio.com/area.json',
+        {method: 'POST',
+            headers: {'Context-Type': 'application/json'},
+            body: JSON.stringify({area})
+        })
+    const data = await response.json();
+    const payload = {...area, id: data.name};
+    await fetch(`https://work-checker-b96e4.firebaseio.com/area/${data.name}/area.json`,
+        {method: 'PATCH',
+            headers: {'Context-Type': 'application/json'},
+            body: JSON.stringify({id: data.name})
+        })
+    dispatch({
+        type: ADD_AREA,
         payload
     })
 }

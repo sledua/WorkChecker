@@ -5,7 +5,7 @@ import {Block} from "galio-framework";
 const MapPreview = props => {
     let imagePreviewUrl;
     if (props.location) {
-        imagePreviewUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${props.location.lat},${props.location.lgn}&zoom=12&size=400x200&maptype=roadmap
+        imagePreviewUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${props.location.lat},${props.location.lgn}&zoom=18&size=400x200&maptype=roadmap
 &markers=color:red%7Clabel:C%7C${props.location.lat},${props.location.lgn}
 &key=${lets.googleApiKey}`;
     }

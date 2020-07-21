@@ -1,8 +1,7 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {StyleSheet} from 'react-native'
+import {StyleSheet, Platform} from 'react-native'
 import MapView, {Marker} from "react-native-maps";
 import {Block, Button, Text, theme} from "galio-framework";
-import { iPhoneX } from '../constants/utils';
 
 const MapScreen = ({navigation}) => {
     const [selectedLocation, setSelectedLocation] = useState();
@@ -49,7 +48,7 @@ const MapScreen = ({navigation}) => {
             </MapView>
             <Block>
                 <Button
-                    style={{width: '100%', marginBottom: iPhoneX ? 30 : null, position: 'absolute', bottom: 0}}
+                    style={{width: '100%', marginBottom: Platform.OS === 'ios' ? 30 : 0, position: 'absolute', bottom: 0}}
                     onPress={saveLocationHandler}
                 >
                     <Text color={theme.COLORS.WHITE} bold size={20} >Ppppp</Text>

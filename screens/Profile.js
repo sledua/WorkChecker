@@ -7,7 +7,8 @@ import {
   FlatList,
   TouchableHighlight,
   ActivityIndicator,
-    View
+    View,
+    Platform
 } from 'react-native';
 import { Block, Text, theme, Button as GaButton } from 'galio-framework';
 import { Button } from '../components';
@@ -300,7 +301,7 @@ const Profile = ({navigation}) => {
             {ust ? (<Block middle row style={{zIndex: 99}}>
               <Button style={{height: 44,
               marginHorizontal: 10,
-              marginBottom: iPhoneX ? 30 : null,
+              marginBottom: Platform.OS === 'ios' ? 30 : 0,
               elevation: 0
             }}
               textStyle={{fontSize: 16}}

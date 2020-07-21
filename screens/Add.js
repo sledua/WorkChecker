@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from "react";
-import {Alert, Dimensions, StyleSheet} from "react-native";
+import {Alert, Dimensions, StyleSheet, Platform} from "react-native";
 import {Block, Button, Input, Text, theme} from "galio-framework";
 import {useDispatch, useSelector} from "react-redux";
-import {addUser} from "../store/actions/worker";
+import {addPlace, addUser} from "../store/actions/worker";
 import {formatTimer} from "../model/timerDate";
 import {nowTheme} from "../constants";
 import ModalDropdown from "react-native-modal-dropdown";
-import { iPhoneX } from '../constants/utils';
+
 
 const { width, height } = Dimensions.get('screen');
 
@@ -14,37 +14,43 @@ const Add = ({navigation}) =>  {
     const dispatch = useDispatch();
     const users = useSelector(state => state.worker.usersAdmin);
 
-
-    const adminPhone = users.map(phone => phone.phone);
-    const [name, setName] = useState('');
-    const [phone, setPhone] = useState('');
     const [valueInBase, setValueInBase] = useState([]);
     const [value, setValue] = useState('');
+    const [idSelectItem, setIdSelectItem] = useState([]);
+    const [ids, setIds] = useState('');
+    const [name, setName] = useState('');
+    const [phone, setPhone] = useState('');
+
+
+    const adminPhone = users.map(phone => phone.phone);
+    const adminPhoneRev = Object.assign({},adminPhone);
+
     const getAllPlace = async () => {
-        const response = await fetch('https://work-checker-b96e4.firebaseio.com/users_area.json',
+        const response = await fetch('https://work-checker-b96e4.firebaseio.com/area.json',
             {
                 method: 'GET',
                 headers: {'Context-Type': 'application/json'}
             })
         const data = await response.json();
-        const allTitle = Object.keys(data).map(key => ({...data[key].users_area}))
+        const allTitle = Object.keys(data).map(key => ({...data[key].area}))
         const onlyTitle = allTitle.map(p=>p.title);
-
+        const onlyId = allTitle.map(id=>id.id)
         setValueInBase(onlyTitle)
+        setIdSelectItem(onlyId);
         setValue(onlyTitle[0])
-        console.log(valueInBase, onlyTitle);
-    }
 
+    }
     useEffect( ()=>{
         getAllPlace();
 
     },[])
     const handleOnSelect = (index, value) => {
-        setValue(valueInBase[index])
+        setValue(valueInBase[index]);
+        setIds(idSelectItem[index]);
     }
     const submitHandler = async () => {
         const user = {
-            phoneAdmin: adminPhone,
+            phoneAdmin: adminPhoneRev["0"],
             name: name,
             phone: phone,
             select: value,
@@ -53,53 +59,73 @@ const Add = ({navigation}) =>  {
             workFlag: '0',
             timeAdd: formatTimer
         }
-       dispatch(addUser(user))
-        Alert.alert('Інформація', `Співробітник ${name} добавлений(а), на завдання ${value}`, [{text: 'Ок'}]);
+        const response = await fetch('https://work-checker-b96e4.firebaseio.com/area.json',
+            {
+                method: 'GET',
+                headers: {'Context-Type': 'application/json'}
+            })
+        const data = await response.json();
+        const carentArea = Object.keys(data).map(key => ({...data[key].area}))
+        const discrArea = carentArea.filter(id => id.id === ids)
+        const discr = discrArea.map(d=>d.descriptions)
+        const discrRev = Object.assign({},discr);
+        const maps = discrArea.map(d=>d.place)
+        const mapsRev = Object.assign({},maps);
+        console.log(mapsRev)
+        const users_area = {
+            name: name,
+            phone: phone,
+            rol: 'співробітник',
+            phoneAdmin: adminPhoneRev["0"],
+            title: value,
+            descriptions:  discrRev["0"],
+            place: mapsRev["0"],
+            timeAdd: formatTimer
+        }
+        dispatch(addUser(user))
+        dispatch(addPlace(users_area) )
+
         setName('')
         setPhone('')
+        Alert.alert('Інформація', `Співробітник ${name} добавлений(а), на завдання ${value}`, [{text: 'Ок'}]);
     };
 
 
     return (
         <Block style={styles.profileBackground} >
-            <Block  style={{ paddingHorizontal: 20, paddingTop: 100, position: 'absolute'}}>
-
-                    <Text color={theme.COLORS.WHITE} size={18} bold>ФІО співробітника</Text>
-                    <Input
-                      placeholder='Введите ФИО'
-                      placeholderTextColor="#4F8EC9"
-                      color={theme.COLORS.BLACK}
-                      onChangeText={setName}
-                      vslue={name}/>
-                    <Text color={theme.COLORS.WHITE} size={18} bold>Телефон співробітника</Text>
-                    <Input
-                      placeholder='+380934666049'
-                      placeholderTextColor="#4F8EC9"
-                      color={theme.COLORS.BLACK}
-                      onChangeText={setPhone}
-                      value={phone}/>
-                    <Text color={theme.COLORS.WHITE} size={18} bold>Виберіть завдання</Text>
-                    <ModalDropdown
-                        style={styles.qty}
-                        onSelect={handleOnSelect}
-                        options={valueInBase}
-                        dropdownStyle={styles.dropdown}
-                        dropdownTextStyle={{ paddingLeft: 16, fontSize: 14 }}>
-                        <Block flex row middle space="between">
-                            <Text size={14} style={styles.text}>
-                                {value}
-                            </Text>
-                        </Block>
-                    </ModalDropdown>
-
+            <Block  style={{ paddingHorizontal: 20, paddingTop: 100}}>
+                <Text color={theme.COLORS.WHITE} size={18} bold>ФІО співробітника</Text>
+                <Input
+                  placeholder='Введите ФИО'
+                  placeholderTextColor="#4F8EC9"
+                  color={theme.COLORS.BLACK}
+                  onChangeText={setName}
+                  value={name}/>
+                <Text color={theme.COLORS.WHITE} size={18} bold>Телефон співробітника</Text>
+                <Input
+                  placeholder='+380934666049'
+                  placeholderTextColor="#4F8EC9"
+                  color={theme.COLORS.BLACK}
+                  onChangeText={setPhone}
+                  value={phone}/>
+                <Text color={theme.COLORS.WHITE} size={18} bold>Виберіть завдання</Text>
+                <ModalDropdown
+                    style={styles.qty}
+                    onSelect={handleOnSelect}
+                    options={valueInBase}
+                    dropdownStyle={styles.dropdown}
+                    dropdownTextStyle={{ paddingLeft: 16, fontSize: 14 }}>
+                    <Block flex row middle space="between">
+                        <Text size={14} style={styles.text}>
+                            {value}
+                        </Text>
+                    </Block>
+                </ModalDropdown>
             </Block>
-            <Block style={{paddingHorizontal: 20, paddingVertical:15, position: 'absolute', bottom:0, }}>
+            <Block style={{paddingHorizontal: 20, paddingVertical:15, marginBottom: Platform.OS === 'ios' ? 30 : 0 }}>
                 <Button
                     shadowless
-                    style={{
-                        height: 44,
-                        elevation: 0,
-                      marginBottom: iPhoneX ? 30 : null}}
+                    style={{marginTop: 2, width: '100%'}}
                     textStyle={{ fontSize: 16 }}
                     onPress={submitHandler}
                     disabled={!name && !phone}

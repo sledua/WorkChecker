@@ -1,12 +1,12 @@
 import React, {useState, useEffect, useCallback} from "react";
-import {StyleSheet, Dimensions, ActivityIndicator, Alert} from "react-native";
+import {StyleSheet, Dimensions, ActivityIndicator, Alert, Platform} from "react-native";
 import {Block, Text, Input, Button, theme, Toast} from "galio-framework";
 import {useDispatch,useSelector} from "react-redux";
-import {addPlace, addUser} from "../store/actions/worker";
+import {addAreas} from "../store/actions/worker";
 import {formatTimer} from "../model/timerDate";
 import MapPreview from "../components/MapPreview";
 import * as Location from "expo-location";
-import { iPhoneX } from '../constants/utils';
+
 
 const { width, height } = Dimensions.get('screen');
 
@@ -15,7 +15,6 @@ const AddArea = ({navigation, route}) =>  {
     const users = useSelector(state => state.worker.usersAdmin);
 
 
-    console.log('addArea', pickLocation)
     const [workTitle, setWorkTitle] = useState('');
     const [descriptions, setDescriptions] = useState('');
     const [workPlace, setWorkPlace] = useState('');
@@ -32,15 +31,16 @@ const AddArea = ({navigation, route}) =>  {
         }
     },[userPikedLocation])
 
-    const submitHandler = async (title, message) => {
-        const users_area = {
+    const submitHandler = async () => {
+
+        const area = {
             phoneAdmin: adminPhoneRev["0"],
             title: workTitle,
             descriptions: descriptions,
             place: pickLocation,
             timeAdd: formatTimer
         }
-        dispatch(addPlace(users_area))
+        dispatch(addAreas(area))
         Alert.alert('Іноформація', `Завдання ${workTitle} добавлено`, [{text: 'Ок'}])
         setWorkTitle('')
         setDescriptions('')
@@ -101,6 +101,7 @@ const AddArea = ({navigation, route}) =>  {
                         size="small"
                         color={theme.COLORS.GREY}
                         onPress={getLocation}
+                        shadowless
                     >
                         <Text color={theme.COLORS.WHITE} bold>Мої координаты</Text>
                     </Button>
@@ -109,14 +110,13 @@ const AddArea = ({navigation, route}) =>  {
                         size="small"
                         color={theme.COLORS.GREY}
                         onPress={getLocationOnMap}
+                        shadowless
                     >
                         <Text color={theme.COLORS.WHITE} bold>Вказати точку на мапі</Text>
                     </Button>
                 </Block>
-
-
             </Block>
-            <Block style={{paddingHorizontal: 20, paddingVertical:15, marginBottom: iPhoneX ? 30 : null,}}>
+            <Block style={{paddingHorizontal: 20, paddingVertical:15, marginBottom: Platform.OS === 'ios' ? 30 : 0}}>
                 <Button
                     style={{marginTop: 2, width: '100%'}}
                     shadowless
