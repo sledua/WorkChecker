@@ -21,6 +21,7 @@ import * as Permissions from 'expo-permissions';
 import {Notifications} from "expo";
 import * as firebase from "firebase";
 import {LOCATION} from "expo-permissions";
+import { iPhoneX } from '../constants/utils';
 const { width, height } = Dimensions.get('screen');
 const thumbMeasure = (width - 48 - 32) / 3;
 const MY_LOCATION = 'My_location';
@@ -105,8 +106,8 @@ const Profile = ({navigation}) => {
   const bgLocationStop = async () => {
     await Location.stopLocationUpdatesAsync(MY_LOCATION)
   }
-  const rt = users.filter(p=>p.rol.toString() === 'співробітник')
-  const rr = users.filter(f=>f.workFlag.toString() === '0');
+  const rt = users.filter(p=>p.rol === 'співробітник')
+  const rr = users.filter(f=>f.workFlag === '0');
   console.log(rr)
   useEffect(()=>{
     getAllArea();
@@ -270,7 +271,7 @@ const Profile = ({navigation}) => {
               {ust ?
                   null :
                   (<View>
-                    {isFetching ?
+                    {!isFetching ?
                         (<View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                           <ActivityIndicator size="large" color={theme.COLORS.PRIMARY}/></View>)
                         :(<FlatList
@@ -298,7 +299,8 @@ const Profile = ({navigation}) => {
               </Block>) : null}
             {ust ? (<Block middle row style={{zIndex: 99}}>
               <Button style={{height: 44,
-              marginHorizontal: 5,
+              marginHorizontal: 10,
+              marginBottom: iPhoneX ? 30 : null,
               elevation: 0
             }}
               textStyle={{fontSize: 16}}

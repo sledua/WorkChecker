@@ -6,6 +6,7 @@ import {addUser} from "../store/actions/worker";
 import {formatTimer} from "../model/timerDate";
 import {nowTheme} from "../constants";
 import ModalDropdown from "react-native-modal-dropdown";
+import { iPhoneX } from '../constants/utils';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -30,11 +31,13 @@ const Add = ({navigation}) =>  {
         const onlyTitle = allTitle.map(p=>p.title);
 
         setValueInBase(onlyTitle)
+        setValue(onlyTitle[0])
         console.log(valueInBase, onlyTitle);
     }
 
     useEffect( ()=>{
-        getAllPlace().then(r => r);
+        getAllPlace();
+
     },[])
     const handleOnSelect = (index, value) => {
         setValue(valueInBase[index])
@@ -51,7 +54,9 @@ const Add = ({navigation}) =>  {
             timeAdd: formatTimer
         }
        dispatch(addUser(user))
-        Alert.alert('Інформація', `Співробітник ${name} добавлений(а), на завдання ${value}`, [{text: 'Ок'}])
+        Alert.alert('Інформація', `Співробітник ${name} добавлений(а), на завдання ${value}`, [{text: 'Ок'}]);
+        setName('')
+        setPhone('')
     };
 
 
@@ -64,13 +69,15 @@ const Add = ({navigation}) =>  {
                       placeholder='Введите ФИО'
                       placeholderTextColor="#4F8EC9"
                       color={theme.COLORS.BLACK}
-                      onChangeText={setName}/>
+                      onChangeText={setName}
+                      vslue={name}/>
                     <Text color={theme.COLORS.WHITE} size={18} bold>Телефон співробітника</Text>
                     <Input
                       placeholder='+380934666049'
                       placeholderTextColor="#4F8EC9"
                       color={theme.COLORS.BLACK}
-                      onChangeText={setPhone}/>
+                      onChangeText={setPhone}
+                      value={phone}/>
                     <Text color={theme.COLORS.WHITE} size={18} bold>Виберіть завдання</Text>
                     <ModalDropdown
                         style={styles.qty}
@@ -91,7 +98,8 @@ const Add = ({navigation}) =>  {
                     shadowless
                     style={{
                         height: 44,
-                        elevation: 0 }}
+                        elevation: 0,
+                      marginBottom: iPhoneX ? 30 : null}}
                     textStyle={{ fontSize: 16 }}
                     onPress={submitHandler}
                     disabled={!name && !phone}

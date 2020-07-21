@@ -4,13 +4,13 @@ import {
   ImageBackground,
   Dimensions,
   TouchableWithoutFeedback,
-  Keyboard, Alert, ActivityIndicator
+  Keyboard, Alert
 } from 'react-native';
 import { Block, Checkbox, Text, theme } from 'galio-framework';
 import { Button, Icon, Input } from '../components';
 import { Images, nowTheme } from '../constants';
 import {useDispatch, useSelector} from "react-redux";
-import {loginUser, runForUsers} from "../store/actions/worker";
+import {runForUsers} from "../store/actions/worker";
 import firebase from "../firebase";
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 import Constants from 'expo-constants';
@@ -20,7 +20,7 @@ const DismissKeyboard = ({ children }) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>{children}</TouchableWithoutFeedback>
 );
 
-const Register = ({navigation}, props) => {
+const Register = ({navigation}) => {
 
   const dispatch = useDispatch();
   const tokens = useSelector(state => state.worker.usersAdmin);
@@ -32,7 +32,8 @@ const Register = ({navigation}, props) => {
   const [isLoading, setIsLoading] = useState(false)
   const [box, setBox] = useState(false)
   const [buttonColor, setButtonColor] = useState('transparent')
-  const [codeLoad, setCodeLoad] = useState(false)
+  const [codeLoad, setCodeLoad] = useState(false);
+  console.log(code);
   const getAllPhone = async () => {
   const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
       {
@@ -46,25 +47,26 @@ const Register = ({navigation}, props) => {
 }
 
   useEffect( ()=>{
-    getAllPhone().then(r=>r);
+    getAllPhone();
   },[])
 
   const authInApp = async () => {
     const getFormatPhone = '+380'+inputPhone;
     const rj = onlyPhone.filter(p => p === getFormatPhone);
-    console.log(rj);
+    console.log(typeof getFormatPhone);
     if(rj.length === 0) {
         Alert.alert('Нажаль','Нажаль ви ще не маете аккаунт, зверніться до адміністратора', [{text: 'Ok'}])
     } else {
-      Alert.alert('Инфо','Ожидайте смс для входа', [{text: 'Ok'}]);
       try{
         const phoneProvider = await new firebase.auth.PhoneAuthProvider();
-        phoneProvider.verifyPhoneNumber(getFormatPhone, recaptchaVerifier.current).then(setVerificationId);
+        await phoneProvider.verifyPhoneNumber(getFormatPhone, recaptchaVerifier.current).then(setVerificationId);
         await dispatch(runForUsers(getFormatPhone))
         setCodeLoad(!codeLoad)
+
       }catch (e) {
         console.log('SMS',e)
       }
+      setInputPhone(null)
     }
   }
   const confirmCode = async () => {
@@ -101,15 +103,12 @@ const Register = ({navigation}, props) => {
                 source={Images.RegisterBackground}
                 style={styles.imageBackgroundContainer}
                 imageStyle={styles.imageBackground}
-            >
+            ><FirebaseRecaptchaVerifierModal
+                ref={recaptchaVerifier}
+                firebaseConfig={Constants.manifest.extra.firebase}
+              />
               <Block flex middle>
                 <Block style={styles.registerContainer}>
-                  <FirebaseRecaptchaVerifierModal
-                      ref={recaptchaVerifier}
-                      firebaseConfig={Constants.manifest.extra.firebase}
-                      title='Капча!'
-                      cancelLabel='Закрити'
-                  />
                     <Block flex middle space="evenly">
                       <Block style={{marginTop: 30, marginBottom: -20}}>
                         <Text
@@ -119,8 +118,7 @@ const Register = ({navigation}, props) => {
                             }}
                             color="#333"
                             size={24}
-                        >
-                          Авторизація
+                        >Авторизація
                         </Text>
                       </Block>
                         {!codeLoad ?
@@ -130,6 +128,7 @@ const Register = ({navigation}, props) => {
                                   autoCompleteType="tel"
                                   style={styles.inputs}
                                   onChangeText={setInputPhone}
+                                  value={inputPhone}
                                   keyboardType="phone-pad"
                                   textContentType="telephoneNumber"
                                   iconContent={
@@ -142,27 +141,25 @@ const Register = ({navigation}, props) => {
                                     />
                                   }
                               />
-                              <Text style={{position: 'absolute', left: 45, top: 20}}>
-                                +(380)</Text>
+                              <Text style={{position: 'absolute', left: 45, top: 22}}>+(380)</Text>
                             </Block>) :
                             (<Block width={width * 0.8} style={{ marginBottom: -10 }}>
                               <Input
                                   placeholder="Код з СМС"
-                                  viewPass
+                                  keyboardType="phone-pad"
                                   style={styles.inputs}
                                   onChangeText={setCode}
+                                  value={code}
                                   iconContent={
                                     <Icon
                                         size={16}
                                         color="#ADB5BD"
                                         name="lock"
                                         family="NowExtra"
-                                        style={styles.inputIcons}
-                                    />
+                                        style={styles.inputIcons}/>
                                   }
                               />
                             </Block>)}
-
                         <Block
                             row
                             middle
@@ -191,7 +188,6 @@ const Register = ({navigation}, props) => {
                             Даю згоду на використання персональних даних для ідентифікації на сервісі
                           </Text>
                         </Block>
-
                       <Block>
                           {!codeLoad ?(<Button
                               color={buttonColor}
@@ -203,26 +199,21 @@ const Register = ({navigation}, props) => {
                                 style={{fontFamily: 'montserrat-bold'}}
                                 size={14}
                                 color={nowTheme.COLORS.WHITE}
-                            >
-                              Відправити пароль
-                            </Text>
-                          </Button>)
+                            >Відправити пароль</Text></Button>)
                             :(<Button
                                 color="primary"
                                 round
                                 style={styles.createButton}
-                                onPress={confirmCode}>
+                                onPress={confirmCode}
+                                disabled={box}>
                               <Text
                                   style={{fontFamily: 'montserrat-bold'}}
                                   size={14}
                                   color={nowTheme.COLORS.WHITE}
-                              >
-                                Увійти
-                              </Text>
-                            </Button>)
-                          }
+                              >Увійти</Text>
+                            </Button>)}
                         </Block>
-                      <Block>{box ? (<Text>Необхідно погодитись з нашими правілами</Text>) : <Text style={{color: nowTheme.COLORS.WHITE}}>OO</Text>}</Block>
+                      <Block>{box ? (<Text>Необхідно погодитись з правілами</Text>) : <Text style={{color: nowTheme.COLORS.WHITE}}>OO</Text>}</Block>
                     </Block>
                 </Block>
               </Block>
@@ -264,7 +255,7 @@ const styles = StyleSheet.create({
     color: nowTheme.COLORS.ICON_INPUT
   },
   inputIconsPhone: {
-    marginRight: 56,
+    marginRight: 60,
     color: nowTheme.COLORS.ICON_INPUT
   },
   inputs: {
@@ -274,7 +265,6 @@ const styles = StyleSheet.create({
   },
   createButton: {
     width: width * 0.4,
-    //marginVertical: 10
     marginBottom: 10,
     marginTop: -30
 

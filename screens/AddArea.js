@@ -6,6 +6,7 @@ import {addPlace, addUser} from "../store/actions/worker";
 import {formatTimer} from "../model/timerDate";
 import MapPreview from "../components/MapPreview";
 import * as Location from "expo-location";
+import { iPhoneX } from '../constants/utils';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -21,7 +22,7 @@ const AddArea = ({navigation, route}) =>  {
     const [isFetching, setIsFetching] = useState(false);
     const [pickLocation, setPickLocation] = useState();
     const [isShow, setShow] = useState(false)
-    const adminPhone = users.map(phone => phone.phone.toString());
+    const adminPhone = users.map(phone => phone.phone);
     const adminPhoneRev = Object.assign({},adminPhone);
     const userPikedLocation = route.params ? route.params.pickedLocation : null;
 
@@ -41,6 +42,9 @@ const AddArea = ({navigation, route}) =>  {
         }
         dispatch(addPlace(users_area))
         Alert.alert('Іноформація', `Завдання ${workTitle} добавлено`, [{text: 'Ок'}])
+        setWorkTitle('')
+        setDescriptions('')
+        setPickLocation()
     };
 
 
@@ -72,13 +76,15 @@ const AddArea = ({navigation, route}) =>  {
                     placeholder='название'
                     placeholderTextColor="#4F8EC9"
                     color={theme.COLORS.BLACK}
-                    onChangeText={setWorkTitle}/>
+                    onChangeText={setWorkTitle}
+                    value={workTitle}/>
                 <Text color={theme.COLORS.WHITE} size={18} bold>Інформація для користувача</Text>
                 <Input
                     placeholder='краткое описание'
                     placeholderTextColor="#4F8EC9"
                     color={theme.COLORS.BLACK}
-                    onChangeText={setDescriptions}/>
+                    onChangeText={setDescriptions}
+                    value={descriptions}/>
                 <Text color={theme.COLORS.WHITE} size={18} bold>Координати</Text>
                 <Block>
                     <MapPreview style={styles.mapPreview} location={pickLocation}>
@@ -91,7 +97,7 @@ const AddArea = ({navigation, route}) =>  {
                 </Block>
                 <Block row>
                     <Button
-                        style={{marginTop: 10, width: '48%', marginHorizontal: 2}}
+                        style={{marginTop: 10, width: '48%', marginHorizontal: 2, elevation: 0}}
                         size="small"
                         color={theme.COLORS.GREY}
                         onPress={getLocation}
@@ -99,7 +105,7 @@ const AddArea = ({navigation, route}) =>  {
                         <Text color={theme.COLORS.WHITE} bold>Мої координаты</Text>
                     </Button>
                     <Button
-                        style={{marginTop: 10, width: '48%', marginHorizontal: 10}}
+                        style={{marginTop: 10, width: '48%', marginHorizontal: 10, elevation: 0}}
                         size="small"
                         color={theme.COLORS.GREY}
                         onPress={getLocationOnMap}
@@ -110,7 +116,7 @@ const AddArea = ({navigation, route}) =>  {
 
 
             </Block>
-            <Block style={{paddingHorizontal: 20, paddingVertical:15}}>
+            <Block style={{paddingHorizontal: 20, paddingVertical:15, marginBottom: iPhoneX ? 30 : null,}}>
                 <Button
                     style={{marginTop: 2, width: '100%'}}
                     shadowless
