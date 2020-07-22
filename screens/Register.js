@@ -141,7 +141,7 @@ const Register = ({navigation}) => {
                                     />
                                   }
                               />
-                              <Text style={{position: 'absolute', left: 45, top: 22}}>+(380)</Text>
+                              <Text style={{position: 'absolute', left: 45, top: 20}}>+(380)</Text>
                             </Block>) :
                             (<Block width={width * 0.8} style={{ marginBottom: -10 }}>
                               <Input

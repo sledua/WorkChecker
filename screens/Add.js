@@ -71,7 +71,6 @@ const Add = ({navigation}) =>  {
         const discrRev = Object.assign({},discr);
         const maps = discrArea.map(d=>d.place)
         const mapsRev = Object.assign({},maps);
-        console.log(mapsRev)
         const users_area = {
             name: name,
             phone: phone,
@@ -93,7 +92,7 @@ const Add = ({navigation}) =>  {
 
     return (
         <Block style={styles.profileBackground} >
-            <Block  style={{ paddingHorizontal: 20, paddingTop: 100}}>
+            <Block  style={{ paddingHorizontal: 20, paddingTop: 100, flex: 1}}>
                 <Text color={theme.COLORS.WHITE} size={18} bold>ФІО співробітника</Text>
                 <Input
                   placeholder='Введите ФИО'
@@ -108,14 +107,14 @@ const Add = ({navigation}) =>  {
                   color={theme.COLORS.BLACK}
                   onChangeText={setPhone}
                   value={phone}/>
-                <Text color={theme.COLORS.WHITE} size={18} bold>Виберіть завдання</Text>
+                <Text color={theme.COLORS.WHITE} size={18} bold >Виберіть завдання</Text>
                 <ModalDropdown
                     style={styles.qty}
                     onSelect={handleOnSelect}
                     options={valueInBase}
                     dropdownStyle={styles.dropdown}
                     dropdownTextStyle={{ paddingLeft: 16, fontSize: 14 }}>
-                    <Block flex row middle space="between">
+                    <Block >
                         <Text size={14} style={styles.text}>
                             {value}
                         </Text>
@@ -143,29 +142,33 @@ const styles = StyleSheet.create({
       flexDirection: 'column',
       justifyContent: 'space-between',
       backgroundColor: theme.COLORS.FACEBOOK,
-      zIndex: -1
+
   },
     qty: {
         width: width * 0.9,
+        height: 40,
         backgroundColor: nowTheme.COLORS.WHITE,
         paddingHorizontal: 16,
         marginVertical: 10,
         paddingTop: 10,
         paddingBottom: 9.5,
-        borderRadius: 4,
+        borderRadius: 5,
         shadowColor: 'rgba(0, 0, 0, 0.1)',
         shadowOffset: { width: 0, height: 2 },
         shadowRadius: 4,
-        shadowOpacity: 1
+        shadowOpacity: 1,
+
     },
     text: {
         color: "#4F8EC9",
-        fontWeight: '600'
+        fontWeight: '600',
+        paddingVertical: 1
     },
     dropdown: {
         marginTop: 8,
         marginLeft: -16,
-        width: width * 0.9
+        width: width * 0.9,
+
     }
 });
 export default Add;
