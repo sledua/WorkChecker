@@ -22,10 +22,9 @@ import * as Permissions from 'expo-permissions';
 import {Notifications} from "expo";
 import * as firebase from "firebase";
 import {LOCATION} from "expo-permissions";
-import { iPhoneX } from '../constants/utils';
 const { width, height } = Dimensions.get('screen');
 const thumbMeasure = (width - 48 - 32) / 3;
-const MY_LOCATION = 'My_location';
+
 async function readPermissions() {
   const result = await Permissions.askAsync(Permissions.LOCATION)
   if(result.status !== 'granted') {
@@ -35,23 +34,6 @@ async function readPermissions() {
   return true;
 }
 const Profile = ({navigation}) => {
-  TaskManager.defineTask(MY_LOCATION, async ({ data, error }) => {
-    if (error) {
-      return;
-    }
-    if (data) {
-      const {locations} = data;
-      const name = users.map(f => f.id);
-      console.log('Received new locations', locations);
-      await fetch(`https://work-checker-b96e4.firebaseio.com/users/${name}/user.json`,
-          {
-            method: 'PATCH',
-            headers: {'Context-Type': 'application/json'},
-            body: JSON.stringify({bgLocations: locations})
-          }
-      )
-    }
-  });
 
   const users = useSelector(state => state.worker.usersAdmin);
   const dispatch = useDispatch();
@@ -83,7 +65,7 @@ const Profile = ({navigation}) => {
       }
     try {
       setIsFetching(true)
-      const loc = await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.High})
+      const loc = await Location.getCurrentPositionAsync({accuracy: Location.Accuracy.High})
       setPickLocation(
          {
           lat: loc.coords.latitude,
@@ -95,26 +77,13 @@ const Profile = ({navigation}) => {
     }
     setIsFetching(false);
   }
-  const bgLocationStart = async () => {
-    await Location.startLocationUpdatesAsync(MY_LOCATION, {
-      accuracy: Location.Accuracy.Balanced,
-      timeInterval: 360000,
-      pausesUpdatesAutomatically: true,
-      activityType: Location.ActivityType.AutomotiveNavigation,
-      showsBackgroundLocationIndicator: true,
-    })
-  }
-  const bgLocationStop = async () => {
-    await Location.stopLocationUpdatesAsync(MY_LOCATION)
-  }
+
   const rt = users.filter(p=>p.rol === 'співробітник')
   const rr = users.filter(f=>f.workFlag === '0');
-  console.log(rr)
-  useEffect(()=>{
-    getAllArea();
-  },[])
+
   useEffect(()=>{
     getLocation();
+    getAllArea();
     if(rt.length === 0) {
       setUst(true)
     } else {
@@ -136,16 +105,27 @@ const Profile = ({navigation}) => {
       if(status !== 'granted') {
         const {status} = await Permissions.askAsync(Permissions.NOTIFICATIONS);
         finalStatus = status;
+
+      } else {
+
       }
       if(finalStatus !== 'granted'){return; }
-
       let token = await Notifications.getExpoPushTokenAsync();
-      const name = users.map(f=>f.id);
-      await fetch(`https://work-checker-b96e4.firebaseio.com/users/${name}/user.json`,
-          {method: 'PATCH',
+      const name = users.map(f=>f.name);
+      const nameRev = Object.assign({},name);
+      const phone = users.map(d=>d.phone)
+      const phoneRev = Object.assign({},phone);
+      await fetch(`https://work-checker-b96e4.firebaseio.com/push_notify.json`,
+          {method: 'POST',
             headers: {'Context-Type': 'application/json'},
-            body: JSON.stringify({idToken: token})
+            body: JSON.stringify({
+              idToken: token,
+              inform: "Разрешил отправку уведомлений",
+              name: nameRev["0"],
+              phone: phoneRev["0"]
+            })
           })
+
     }catch (e) {
       console.log("token", e)
     }
@@ -164,12 +144,12 @@ const Profile = ({navigation}) => {
       setButn(true)
       Alert.alert('Інформація', 'Передача данних почалась', [{text: 'Ok'}])
       const workFlag = '1'
-      bgLocationStart().then(r => r);
+
       dispatch(updateUser(id, workFlag, location, timer))
     } else {
       setButn(false)
       Alert.alert('Інформація', 'Дякую', [{text: 'Ok'}]);
-      bgLocationStop().then(r => r);
+
       const workFlag = '0'
       const timer = {'timeStop': formatTimer}
       dispatch(updateUser(id, workFlag, location, timer))
