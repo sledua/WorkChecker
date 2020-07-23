@@ -4,6 +4,7 @@ import { Block, Text, theme } from "galio-framework";
 
 import Icon from "./Icon";
 import nowTheme from "../constants/Theme";
+import AsyncStorage from "@react-native-community/async-storage";
 
 class DrawerItem extends React.Component {
   renderIcon = () => {
@@ -87,12 +88,10 @@ class DrawerItem extends React.Component {
     return (
       <TouchableOpacity
         style={{ height: 60 }}
-        onPress={() =>
-          title == "GETTING STARTED"
-            ? Linking.openURL(
-                "https://demos.creative-tim.com/now-ui-pro-react-native/docs/"
-              ).catch(err => console.error("An error occurred", err))
-            : navigation.navigate(title == 'ВИХІД' ? 'Onboarding' : title)
+        onPress={() => {
+          title == 'ВИХІД' ? AsyncStorage.clear() : title
+          navigation.navigate(title == 'ВИХІД' ? 'Onboarding' : title)
+        }
         }
       >
         <Block flex row style={containerStyles}>

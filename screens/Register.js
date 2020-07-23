@@ -59,22 +59,23 @@ const Register = ({navigation}) => {
       try{
         const phoneProvider = await new firebase.auth.PhoneAuthProvider();
         await phoneProvider.verifyPhoneNumber(getFormatPhone, recaptchaVerifier.current).then(setVerificationId);
-
-        await dispatch(runForUsers(getFormatPhone))
         setCodeLoad(!codeLoad)
 
       }catch (e) {
         console.log('SMS',e)
       }
-      setInputPhone(null)
+
     }
   }
   const confirmCode = async () => {
+    const getFormatPhone = '+380'+inputPhone;
+    await dispatch(runForUsers(verificationId, getFormatPhone))
+    setInputPhone(null)
     if(!verificationId){
       Alert.alert('Ошибка','Сесия устарела, повторите отправке смс', [{text: 'Добре'}])
     } else {
       setIsLoading(true)
-      await dispatch(loginUser(verificationId))
+
       try{
         const credential = await firebase.auth.PhoneAuthProvider.credential(
             verificationId,

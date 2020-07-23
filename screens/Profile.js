@@ -50,8 +50,8 @@ const Profile = ({navigation}) => {
         })
     const data = await response.json();
     const allArea = Object.keys(data).map(key => ({...data[key].users_area}))
-    const myAdminSelect = users.map(phone=>phone.phoneAdmin)
-    const adminSelect = allArea.filter(p=>p.phoneAdmin !== myAdminSelect)
+    const myAdminSelect = users.map(phone=>phone.phone)
+    const adminSelect = allArea.filter(p=>p.phone === myAdminSelect.toString())
     setOnlyArea(adminSelect)
     setIsFetching(true)
   }
@@ -133,7 +133,7 @@ const Profile = ({navigation}) => {
   const bgLocationStart = async () => {
     await Location.startLocationUpdatesAsync('My_location', {
       accuracy: Location.Accuracy.Balanced,
-      deferredUpdatesInterval: 5000,
+      deferredUpdatesInterval: 360000,
       pausesUpdatesAutomatically: true,
       activityType: Location.ActivityType.AutomotiveNavigation,
       showsBackgroundLocationIndicator: true,
@@ -148,9 +148,19 @@ const Profile = ({navigation}) => {
     }
     if (data) {
       const {locations} = data;
-      const mapsRev = Object.assign({},locations);
-      console.log('Received new locations', mapsRev, formatTimer);
-      await fetch(`https://work-checker-b96e4.firebaseio.com/locations/${name}.json`,
+      const response = await fetch('https://work-checker-b96e4.firebaseio.com/locations.json',
+          {
+            method: 'GET',
+            headers: {'Context-Type': 'application/json'}
+          })
+      const datas = await response.json();
+      const allLocations = Object.keys(datas).map(key => ({...datas[key]}))
+      const myPhone = users.map(phone=>phone.phone)
+      const myLocationSelect = allLocations.filter(p=>p.phone === myPhone.toString())
+      const locationId = myLocationSelect.map(i=>i.id)
+       const mapsRev = Object.assign({},locations);
+       console.log('Received new locations', locations);
+      await fetch(`https://work-checker-b96e4.firebaseio.com/locations/${locationId}.json`,
           {
             method: 'PATCH',
             headers: {'Context-Type': 'application/json'},
@@ -165,7 +175,7 @@ const Profile = ({navigation}) => {
     const location = pickLocation;
     const timer = {'timeStart': formatTimer}
     const rr = users.filter(f=>f.workFlag.toString() === '0')
-    console.log(rr);
+
 
     if(rr.length !== 0) {
       setButn(true)
@@ -286,7 +296,7 @@ const Profile = ({navigation}) => {
                             data={onlyArea}
                             keyExtractor={item => item.id.toString()}
                             renderItem={({item}) =>
-                                <Block style={{paddingVertical: 5}}>
+                                <Block style={{paddingTop: 25}}>
                                   <Text bold size={18} color={theme.COLORS.WHITE}
                                         style={{fontFamily: 'montserrat-bold',}}>Завдання</Text>
                                   <Text size={16} color={theme.COLORS.WHITE}>{item.title}</Text>

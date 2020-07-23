@@ -7,7 +7,7 @@ import {
 import { Block, Text, theme } from "galio-framework";
 import { useSafeArea } from "react-native-safe-area-context";
 import { DrawerItem as DrawerCustomItem, Icon } from "../components";
-
+import AsyncStorage from '@react-native-community/async-storage';
 const { width } = Dimensions.get("screen");
 
 function CustomDrawerContent({
@@ -50,7 +50,7 @@ function CustomDrawerContent({
               />
             </Block>
           </Block>
-        <DrawerCustomItem title="ВИХІД" navigation={navigation}/>
+        <DrawerCustomItem title="ВИХІД" navigation={navigation} />
         </ScrollView>
       </Block>
     </Block>

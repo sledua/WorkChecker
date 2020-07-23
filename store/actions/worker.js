@@ -1,18 +1,28 @@
+import AsyncStorage from '@react-native-community/async-storage';
 export const CREATE_USER = 'CREATE_PRODUCT';
 export const UPDATE_USER = 'UPDATE_USER';
 export const RUN_FOR_USERS = 'RUN_FOR_USERS';
 export const ADD_PLACE = 'ADD_PLACE';
 export const ADD_AREA = 'ADD_AREA';
-export const LOGIN = 'LOGIN';
+export const AUTHENTICATE = 'AUTHENTICATE';
 
-export const loginUser = verificationId => async dispatch => {
+export const authInto = (verificationId, inputPhone) => async dispatch => {
+    const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
+        {
+            method: 'GET',
+            headers: {'Context-Type': 'application/json'}
+        })
+    const data = await response.json();
+    const USERS = Object.keys(data).map(key => ({...data[key].user}))
     dispatch({
-        type: LOGIN,
-        token: verificationId
+        type: AUTHENTICATE,
+        inputToken: verificationId,
+        input: inputPhone,
+        payload: USERS,
+
     })
 }
-
-export const runForUsers = inputPhone => async  dispatch => {
+export const runForUsers = (verificationId, inputPhone) => async  dispatch => {
     const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
         {
             method: 'GET',
@@ -23,8 +33,10 @@ export const runForUsers = inputPhone => async  dispatch => {
     dispatch({
         type: RUN_FOR_USERS,
         input: inputPhone,
-        payload: USERS
+        payload: USERS,
+        inputToken: verificationId
     })
+    await saveDataUser(verificationId, inputPhone)
 }
 
 export const updateUser = (id, workFlag, location, timer) => async dispatch => {
@@ -112,4 +124,14 @@ export const addUser = user => async dispatch => {
         type: CREATE_USER,
         payload
     })
+}
+const saveDataUser = async (token, inputPhone) => {
+    try {
+        await AsyncStorage.setItem('user', JSON.stringify({
+            token: token,
+            inputPhone: inputPhone
+        }));
+    } catch (error) {
+        console.log('eee action', error)
+    }
 }

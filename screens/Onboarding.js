@@ -1,21 +1,33 @@
 import React from 'react';
-import { ImageBackground, Image, StyleSheet, StatusBar, Dimensions, Platform } from 'react-native';
+import { ImageBackground, StyleSheet, StatusBar, Dimensions, Platform } from 'react-native';
 import { Block, Button, Text, theme } from 'galio-framework';
-
+import AsyncStorage from '@react-native-community/async-storage';
 const { height, width } = Dimensions.get('screen');
 import { Images, nowTheme } from '../constants/';
 import { HeaderHeight } from '../constants/utils';
-import {useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
+import {authInto} from "../store/actions/worker";
 
 const Onboarding = ({navigation}) => {
-  const token = useSelector(state => state.worker.token);
-    const roadMap = () => {
-      if(!token) {
-        navigation.navigate('Account')
-      } else {
+  const dispatch = useDispatch();
+      const roadMap = async () => {
+        try {
+          const userData = await AsyncStorage.getItem('user');
+          if(!userData) {
+            navigation.navigate('Account')
+            return ;
+          }
+          const transform = JSON.parse(userData);
+          const {token, inputPhone} = transform;
+          await dispatch(authInto(token, inputPhone))
+          console.log(token, inputPhone);
+        } catch (e) {
+          console.log('Title error',e)
+        }
         navigation.navigate("App")
+
       }
-    }
+
 
     return (
       <Block flex style={styles.container}>

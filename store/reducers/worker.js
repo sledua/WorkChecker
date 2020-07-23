@@ -1,4 +1,4 @@
-import {CREATE_USER, UPDATE_USER, RUN_FOR_USERS, LOGIN} from "../actions/worker";
+import {CREATE_USER, UPDATE_USER, RUN_FOR_USERS, AUTHENTICATE} from "../actions/worker";
 
 const initialState = {
     usersAdmin: [],
@@ -7,15 +7,16 @@ const initialState = {
 };
 export const workerReducer = (state = initialState, action) => {
     switch (action.type) {
-        case LOGIN:
+        case AUTHENTICATE:
             return{...state,
-                token: action.token
+                usersAdmin: action.payload.filter( p => p.phone === action.input),
+                token: action.inputToken
             }
         case RUN_FOR_USERS:
             return {
                 ...state,
                 usersAdmin: action.payload.filter( p => p.phone === action.input),
-
+                token: action.inputToken
             }
         case UPDATE_USER:
             const usersAdmin = state.usersAdmin.map(i => {
