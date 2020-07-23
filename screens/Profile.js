@@ -20,8 +20,6 @@ import * as TaskManager from 'expo-task-manager';
 import {formatTimer} from "../model/timerDate";
 import * as Permissions from 'expo-permissions';
 import {Notifications} from "expo";
-import * as firebase from "firebase";
-import {LOCATION} from "expo-permissions";
 const { width, height } = Dimensions.get('screen');
 const thumbMeasure = (width - 48 - 32) / 3;
 
@@ -84,12 +82,13 @@ const Profile = ({navigation}) => {
   useEffect(()=>{
     getLocation();
     getAllArea();
+    registerForPushNotifications();
     if(rt.length === 0) {
       setUst(true)
     } else {
       setUst(false)
     }
-    registerForPushNotifications();
+
     if (rr.length !== 0) {
       setButn(false);
     } else {
@@ -131,7 +130,35 @@ const Profile = ({navigation}) => {
     }
 
   }
-
+  const bgLocationStart = async () => {
+    await Location.startLocationUpdatesAsync('My_location', {
+      accuracy: Location.Accuracy.Balanced,
+      deferredUpdatesInterval: 5000,
+      pausesUpdatesAutomatically: true,
+      activityType: Location.ActivityType.AutomotiveNavigation,
+      showsBackgroundLocationIndicator: true,
+    })}
+  const bgLocationStop = async () => {
+    await Location.stopLocationUpdatesAsync('My_location')
+  }
+  TaskManager.defineTask('My_location',  async ({ data, error }) => {
+    if (error) {
+      console.log(error)
+      return;
+    }
+    if (data) {
+      const {locations} = data;
+      const mapsRev = Object.assign({},locations);
+      console.log('Received new locations', mapsRev, formatTimer);
+      await fetch(`https://work-checker-b96e4.firebaseio.com/locations/${name}.json`,
+          {
+            method: 'PATCH',
+            headers: {'Context-Type': 'application/json'},
+            body: JSON.stringify({bgLocations: mapsRev["0"]})
+          }
+      )
+    }
+  });
   const workUpdater = useCallback(() =>{
 
     const id = users.map(p => p.id);
@@ -144,12 +171,12 @@ const Profile = ({navigation}) => {
       setButn(true)
       Alert.alert('Інформація', 'Передача данних почалась', [{text: 'Ok'}])
       const workFlag = '1'
-
+      bgLocationStart()
       dispatch(updateUser(id, workFlag, location, timer))
     } else {
       setButn(false)
       Alert.alert('Інформація', 'Дякую', [{text: 'Ok'}]);
-
+      bgLocationStop()
       const workFlag = '0'
       const timer = {'timeStop': formatTimer}
       dispatch(updateUser(id, workFlag, location, timer))

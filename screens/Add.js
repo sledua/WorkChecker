@@ -55,7 +55,6 @@ const Add = ({navigation}) =>  {
             phone: phone,
             select: value,
             rol: 'співробітник',
-            location: '',
             workFlag: '0',
             timeAdd: formatTimer
         }

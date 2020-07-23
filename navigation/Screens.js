@@ -133,7 +133,7 @@ function ProfileStack(props) {
   return (
     <Stack.Navigator initialRouteName="Profile" mode="card" headerMode="screen">
       <Stack.Screen
-        name="ПРОФІЛЬ"
+        name="Profile"
         component={Profile}
         options={{
           header: ({ navigation, scene }) => (
@@ -183,9 +183,9 @@ function AppStack(props) {
           fontWeight: "normal"
         }
       }}
-      initialRouteName="ПРОФІЛЬ"
+      initialRouteName="Profile"
     >
-      <Drawer.Screen name="ПРОФІЛЬ" component={ProfileStack} />
+      <Drawer.Screen name="Profile" component={ProfileStack} />
       <Drawer.Screen name="ІНФОРМАЦІЯ" component={AboutStack} />
       <Drawer.Screen name="Add" component={AddStack} />
       <Drawer.Screen name="AddArea" component={AddAreaStack} />

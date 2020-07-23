@@ -20,7 +20,7 @@ function CustomDrawerContent({
 }) {
   const insets = useSafeArea();
   const screens = [
-    "ПРОФІЛЬ",
+    "Profile",
     "ІНФОРМАЦІЯ",
   ];
   return (

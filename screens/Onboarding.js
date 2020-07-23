@@ -5,10 +5,17 @@ import { Block, Button, Text, theme } from 'galio-framework';
 const { height, width } = Dimensions.get('screen');
 import { Images, nowTheme } from '../constants/';
 import { HeaderHeight } from '../constants/utils';
+import {useSelector} from "react-redux";
 
-export default class Onboarding extends React.Component {
-  render() {
-    const { navigation } = this.props;
+const Onboarding = ({navigation}) => {
+  const token = useSelector(state => state.worker.token);
+    const roadMap = () => {
+      if(!token) {
+        navigation.navigate('Account')
+      } else {
+        navigation.navigate("App")
+      }
+    }
 
     return (
       <Block flex style={styles.container}>
@@ -46,7 +53,7 @@ export default class Onboarding extends React.Component {
                   shadowless
                   style={styles.button}
                   color={nowTheme.COLORS.PRIMARY}
-                  onPress={() => navigation.navigate('Account')}
+                  onPress={() => roadMap()}
                 >
                   <Text
                     style={{ fontFamily: 'montserrat-bold', fontSize: 14 }}
@@ -61,7 +68,6 @@ export default class Onboarding extends React.Component {
         </Block>
       </Block>
     );
-  }
 }
 
 const styles = StyleSheet.create({
@@ -91,3 +97,4 @@ const styles = StyleSheet.create({
     height: 66
   }
 });
+export default Onboarding;

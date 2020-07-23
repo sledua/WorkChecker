@@ -8,7 +8,7 @@ const initialState = {
 export const workerReducer = (state = initialState, action) => {
     switch (action.type) {
         case LOGIN:
-            return{
+            return{...state,
                 token: action.token
             }
         case RUN_FOR_USERS:

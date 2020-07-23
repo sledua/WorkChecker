@@ -10,10 +10,10 @@ import { Block, Checkbox, Text, theme } from 'galio-framework';
 import { Button, Icon, Input } from '../components';
 import { Images, nowTheme } from '../constants';
 import {useDispatch, useSelector} from "react-redux";
-import {runForUsers} from "../store/actions/worker";
+import {loginUser, runForUsers} from "../store/actions/worker";
 import firebase from "../firebase";
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
-import Constants from 'expo-constants';
+import Constants from "expo-constants";
 const { width, height } = Dimensions.get('screen');
 
 const DismissKeyboard = ({ children }) => (
@@ -33,7 +33,6 @@ const Register = ({navigation}) => {
   const [box, setBox] = useState(false)
   const [buttonColor, setButtonColor] = useState('transparent')
   const [codeLoad, setCodeLoad] = useState(false);
-  console.log(code);
   const getAllPhone = async () => {
   const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
       {
@@ -53,13 +52,14 @@ const Register = ({navigation}) => {
   const authInApp = async () => {
     const getFormatPhone = '+380'+inputPhone;
     const rj = onlyPhone.filter(p => p === getFormatPhone);
-    console.log(typeof getFormatPhone);
+
     if(rj.length === 0) {
         Alert.alert('Нажаль','Нажаль ви ще не маете аккаунт, зверніться до адміністратора', [{text: 'Ok'}])
     } else {
       try{
         const phoneProvider = await new firebase.auth.PhoneAuthProvider();
         await phoneProvider.verifyPhoneNumber(getFormatPhone, recaptchaVerifier.current).then(setVerificationId);
+
         await dispatch(runForUsers(getFormatPhone))
         setCodeLoad(!codeLoad)
 
@@ -74,11 +74,13 @@ const Register = ({navigation}) => {
       Alert.alert('Ошибка','Сесия устарела, повторите отправке смс', [{text: 'Добре'}])
     } else {
       setIsLoading(true)
+      await dispatch(loginUser(verificationId))
       try{
         const credential = await firebase.auth.PhoneAuthProvider.credential(
             verificationId,
             code
         );
+
         await firebase
             .auth()
             .signInWithCredential(credential)

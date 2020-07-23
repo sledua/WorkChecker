@@ -84,6 +84,17 @@ export const addAreas = area => async  dispatch => {
     })
 }
 export const addUser = user => async dispatch => {
+    const res = await fetch('https://work-checker-b96e4.firebaseio.com/locations.json', {
+        method: 'POST',
+        headers: {'Context-Type': 'application/json'},
+        body: JSON.stringify({name: user.name, phone: user.phone})
+    })
+    const dataloc = await res.json();
+    await fetch(`https://work-checker-b96e4.firebaseio.com/locations/${dataloc.name}.json`,
+        {method: 'PATCH',
+            headers: {'Context-Type': 'application/json'},
+            body: JSON.stringify({id: dataloc.name})
+        })
 
     const response = await fetch('https://work-checker-b96e4.firebaseio.com/users.json',
         {method: 'POST',

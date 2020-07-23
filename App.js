@@ -5,14 +5,12 @@ import * as Font from 'expo-font';
 import { Asset } from 'expo-asset';
 import { Block, GalioProvider } from 'galio-framework';
 import { NavigationContainer } from '@react-navigation/native';
-import {Provider} from 'react-redux';
+import {Provider, useSelector} from 'react-redux';
 import store from './store'
 import Screens from './navigation/Screens';
 import { Images, articles, nowTheme } from './constants';
-import * as Location from "expo-location";
-import * as TaskManager from "expo-task-manager";
 
-const MY_LOCATION = 'My_location';
+
 // cache app images
 const assetImages = [
   Images.Onboarding,
@@ -22,8 +20,6 @@ const assetImages = [
   Images.iOSLogo,
   Images.androidLogo,
   Images.ProfilePicture,
-  Images.CreativeTimLogo,
-  Images.InvisionLogo,
   Images.RegisterBackground,
   Images.ProfileBackground
 ];
@@ -46,7 +42,6 @@ export default class App extends React.Component {
     isLoadingComplete: false,
     fontLoaded: false
   };
-
   // async componentDidMount() {
   //   Font.loadAsync({
   //     'montserrat-regular': require('./assets/font/Montserrat-Regular.ttf'),
@@ -55,15 +50,6 @@ export default class App extends React.Component {
 
   //   this.setState({ fontLoaded: true });
   // }
-  bgLocationStart = async () => {
-    await Location.startLocationUpdatesAsync(MY_LOCATION, {
-      accuracy: Location.Accuracy.Balanced,
-      timeInterval: 10000,
-      pausesUpdatesAutomatically: true,
-      activityType: Location.ActivityType.AutomotiveNavigation,
-      showsBackgroundLocationIndicator: true,
-    })
-  }
   render() {
 
     if (!this.state.isLoadingComplete) {
@@ -113,23 +99,6 @@ export default class App extends React.Component {
   };
 
 
-  bgLocationStop = async () => {
-    await Location.stopLocationUpdatesAsync(MY_LOCATION)
-  }
+
 }
-TaskManager.defineTask(MY_LOCATION, async ({ data, error }) => {
-  if (error) {
-    return;
-  }
-  if (data) {
-    const {locations} = data;
-    console.log('Received new locations', locations);
-    // await fetch(`https://work-checker-b96e4.firebaseio.com/users/${name}/user.json`,
-    //     {
-    //       method: 'PATCH',
-    //       headers: {'Context-Type': 'application/json'},
-    //       body: JSON.stringify({bgLocations: locations})
-    //     }
-    // )
-  }
-});
+
