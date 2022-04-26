@@ -44,7 +44,7 @@
       "permissions": ["ACCESS_FINE_LOCATION","ACCESS_COARSE_LOCATION"],
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyDoc50sF0s6zLxzgmFgKZmf0MSYds5NL48"
+          "apiKey": ""
         }
       }
     },
